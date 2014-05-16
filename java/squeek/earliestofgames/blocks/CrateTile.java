@@ -3,9 +3,11 @@ package squeek.earliestofgames.blocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 
 public class CrateTile extends TileEntity implements IInventory
 {
@@ -38,7 +40,10 @@ public class CrateTile extends TileEntity implements IInventory
 			if (itemStack.stackSize <= count)
 				setInventorySlotContents(slotNum, null);
 			else
+			{
 				itemStack = itemStack.splitStack(count);
+				markDirty();
+			}
 		}
 
 		return itemStack;
@@ -59,6 +64,8 @@ public class CrateTile extends TileEntity implements IInventory
 
 		if (itemStack != null && itemStack.stackSize > getInventoryStackLimit())
 			itemStack.stackSize = getInventoryStackLimit();
+		
+		markDirty();
 	}
 
 	@Override
@@ -82,7 +89,7 @@ public class CrateTile extends TileEntity implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		return true;
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -124,5 +131,24 @@ public class CrateTile extends TileEntity implements IInventory
 		}
 
 		compound.setTag("Inventory", items);
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound)
+	{
+		super.readFromNBT(compound);
+
+		NBTTagList items = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+
+		for (int slotNum = 0; slotNum < items.tagCount(); slotNum++)
+		{
+			NBTTagCompound item = items.getCompoundTagAt(slotNum);
+			int slot = item.getByte("Slot");
+
+			if (slot >= 0 && slot < getSizeInventory())
+			{
+				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
+			}
+		}
 	}
 }
