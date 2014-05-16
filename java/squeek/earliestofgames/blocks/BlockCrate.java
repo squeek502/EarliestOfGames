@@ -1,14 +1,13 @@
 package squeek.earliestofgames.blocks;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 
-public class BlockCrate extends Block
+public class BlockCrate extends BlockContainer
 {
-
-	protected BlockCrate(Material material)
+	public BlockCrate()
 	{
-		super(material);
+		super(Material.wood);
 		setBlockName("crate");
 	}
 	
@@ -17,5 +16,4 @@ public class BlockCrate extends Block
 	{
 		return meta;
 	}
-	
 }
