@@ -15,7 +15,7 @@ public class ModEarliestOfGames
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		
+		ModContent.registerBlocks();
 	}
 
 	@EventHandler
