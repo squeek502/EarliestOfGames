@@ -26,6 +26,12 @@ public abstract class Container extends net.minecraft.inventory.Container
 		int numSlotsPerRow = inventory.getSizeInventory() / rows;
 		for (int i = 0, col = 0, row = 0; i < inventory.getSizeInventory(); ++i, ++col)
 		{
+			if (col >= numSlotsPerRow)
+			{
+				row++;
+				col = 0;
+			}
+			
 			try
 			{
 				this.addSlotToContainer(slotClass.getConstructor(IInventory.class, int.class, int.class, int.class).newInstance(inventory, i, xStart + col * 18, yStart + row * 18));
@@ -33,12 +39,6 @@ public abstract class Container extends net.minecraft.inventory.Container
 			catch (Exception e)
 			{
 				e.printStackTrace();
-			}
-
-			if (col >= numSlotsPerRow)
-			{
-				row++;
-				col = 0;
 			}
 		}
 	}
