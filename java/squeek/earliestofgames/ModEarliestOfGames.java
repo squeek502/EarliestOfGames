@@ -7,6 +7,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION)
 public class ModEarliestOfGames
@@ -20,6 +21,7 @@ public class ModEarliestOfGames
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		ModContent.registerBlocks();
+		ModContent.registerHandlers();
 	}
 
 	@EventHandler

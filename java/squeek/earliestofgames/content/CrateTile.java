@@ -71,7 +71,7 @@ public class CrateTile extends TileEntity implements IInventory
 	@Override
 	public String getInventoryName()
 	{
-		return null;
+		return getBlockType().getLocalizedName();
 	}
 
 	@Override

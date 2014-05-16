@@ -28,7 +28,7 @@ public abstract class Container extends net.minecraft.inventory.Container
 		{
 			try
 			{
-				this.addSlotToContainer(slotClass.getConstructor(IInventory.class, Integer.class, Integer.class, Integer.class).newInstance(inventory, i, xStart + col * 18, yStart + row * 18));
+				this.addSlotToContainer(slotClass.getConstructor(IInventory.class, int.class, int.class, int.class).newInstance(inventory, i, xStart + col * 18, yStart + row * 18));
 			}
 			catch (Exception e)
 			{
