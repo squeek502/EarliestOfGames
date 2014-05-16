@@ -17,6 +17,7 @@ public class Crate extends BlockContainer
 	{
 		super(Material.wood);
 		setBlockName(ModInfo.MODID + "." + this.getClass().getSimpleName());
+		setBlockTextureName(ModInfo.MODID + ":" + this.getClass().getSimpleName());
 	}
 
 	@Override
