@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.content.CrateContainer;
+import squeek.earliestofgames.content.CrateGui;
 import squeek.earliestofgames.content.CrateTile;
 import cpw.mods.fml.common.network.IGuiHandler;
 
