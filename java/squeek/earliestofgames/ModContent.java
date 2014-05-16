@@ -1,15 +1,15 @@
 package squeek.earliestofgames;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import squeek.earliestofgames.blocks.BlockCrate;
+import squeek.earliestofgames.blocks.Crate;
 
 public class ModContent
 {
-	public static BlockCrate blockCrate;
+	public static Crate blockCrate;
 
 	public static void registerBlocks()
 	{
-		blockCrate = (BlockCrate) new BlockCrate();
-		GameRegistry.registerBlock(blockCrate, blockCrate.getUnlocalizedName());
+		blockCrate = new Crate();
+		GameRegistry.registerBlock(blockCrate, blockCrate.blockName);
 	}
 }

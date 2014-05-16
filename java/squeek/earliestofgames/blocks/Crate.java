@@ -1,17 +1,32 @@
 package squeek.earliestofgames.blocks;
 
 import squeek.earliestofgames.ModInfo;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-public class BlockCrate extends BlockContainer
+public class Crate extends BlockContainer
 {
-	public BlockCrate()
+	public String blockName;
+	
+	public Crate()
 	{
 		super(Material.wood);
-		setBlockName(ModInfo.MODID+"."+this.getClass().getName());
+		setBlockName(ModInfo.MODID+"."+this.getClass().getSimpleName());
+	}
+	
+	@Override
+	public Block setBlockName(String blockName)
+	{
+		this.blockName = blockName;
+		return super.setBlockName(blockName);
+	}
+	
+	public String getBlockName()
+	{
+		return blockName;
 	}
 	
 	@Override
