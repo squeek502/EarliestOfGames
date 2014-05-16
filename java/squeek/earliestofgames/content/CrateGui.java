@@ -10,7 +10,7 @@ import squeek.earliestofgames.ModInfo;
 
 public class CrateGui extends GuiContainer
 {
-	public static final ResourceLocation textureLocation = new ResourceLocation(ModInfo.MODID, "textures/gui/crate.png");
+	public static final ResourceLocation textureLocation = new ResourceLocation(ModInfo.MODID_LOWER, "textures/gui/crate.png");
 	protected IInventory playerInventory = null;
 	protected IInventory inventory = null;
 
@@ -19,6 +19,7 @@ public class CrateGui extends GuiContainer
 		super(new CrateContainer(playerInventory, crate));
 		this.inventory = crate;
 		this.playerInventory = playerInventory;
+		this.ySize = 151;
 	}
 
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
@@ -30,7 +31,7 @@ public class CrateGui extends GuiContainer
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(textureLocation); //new ResourceLocation("test", "test.png"));
+		this.mc.getTextureManager().bindTexture(textureLocation);
 		int k = (this.width - this.xSize) / 2;
 		int l = (this.height - this.ySize) / 2;
 		this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);

@@ -130,7 +130,7 @@ public class CrateTile extends TileEntity implements IInventory
 			}
 		}
 
-		compound.setTag("Inventory", items);
+		compound.setTag("Items", items);
 	}
 
 	@Override

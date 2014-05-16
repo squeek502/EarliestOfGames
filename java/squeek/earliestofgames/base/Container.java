@@ -84,7 +84,7 @@ public abstract class Container extends net.minecraft.inventory.Container
 					return null;
 				}
 			}
-			else if (inventory.isItemValidForSlot(slotNum, itemstack1) || !this.mergeItemStack(itemstack1, 0, this.inventory.getSizeInventory(), false))
+			else if (!inventory.isItemValidForSlot(slotNum, itemstack1) || !this.mergeItemStack(itemstack1, 0, this.inventory.getSizeInventory(), false))
 			{
 				return null;
 			}
