@@ -1,4 +1,4 @@
-package squeek.earliestofgames.blocks;
+package squeek.earliestofgames.content;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -15,7 +15,7 @@ public class CrateTile extends TileEntity implements IInventory
 
 	public CrateTile()
 	{
-		inventoryItems = new ItemStack[8];
+		inventoryItems = new ItemStack[14];
 	}
 
 	@Override

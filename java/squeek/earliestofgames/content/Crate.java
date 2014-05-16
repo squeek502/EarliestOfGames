@@ -1,4 +1,4 @@
-package squeek.earliestofgames.blocks;
+package squeek.earliestofgames.content;
 
 import squeek.earliestofgames.ModInfo;
 import squeek.earliestofgames.helpers.GuiHelper;

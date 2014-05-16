@@ -1,14 +1,14 @@
-package squeek.earliestofgames.blocks;
+package squeek.earliestofgames.content;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.entity.player.InventoryPlayer;
+import squeek.earliestofgames.base.Container;
 
 public class CrateContainer extends Container
 {
 	CrateTile crate = null;
 	
-	public CrateContainer(IInventory playerInventory, CrateTile crate)
+	public CrateContainer(InventoryPlayer playerInventory, CrateTile crate)
 	{
 		this.crate = crate;
 	}

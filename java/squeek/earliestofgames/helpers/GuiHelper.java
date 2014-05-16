@@ -4,8 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import squeek.earliestofgames.ModEarliestOfGames;
-import squeek.earliestofgames.blocks.CrateContainer;
-import squeek.earliestofgames.blocks.CrateTile;
+import squeek.earliestofgames.content.CrateContainer;
+import squeek.earliestofgames.content.CrateTile;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class GuiHelper implements IGuiHandler

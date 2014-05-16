@@ -1,7 +1,7 @@
 package squeek.earliestofgames;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import squeek.earliestofgames.blocks.Crate;
+import squeek.earliestofgames.content.Crate;
 
 public class ModContent
 {
