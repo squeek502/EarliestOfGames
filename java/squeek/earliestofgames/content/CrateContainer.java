@@ -13,11 +13,7 @@ public class CrateContainer extends Container
 	{
 		this.crate = crate;
 
-		for (int i = 0; i < crate.getSizeInventory(); ++i)
-		{
-			this.addSlotToContainer(new Slot(crate, i, 44 + i * 18, 20));
-		}
-
+		addSlots(crate, 26, 20, 2);
 		addPlayerInventorySlots(playerInventory, 69);
 	}
 
