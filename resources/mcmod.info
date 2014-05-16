@@ -1,0 +1,16 @@
+[
+{
+  "modid": "EarliestOfGames",
+  "name": "Earliest of Games",
+  "description": "A collection of early-game-centric things",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["squeek"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

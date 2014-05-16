@@ -34,7 +34,7 @@ local function commit(message_title)
 		end
 		
 		-- commit
-		os.execute('git commit --short -m "'..message_title..'" -m "'..message_body..'"'..(DRY_RUN and " --dry-run" or ""))
+		os.execute('git commit -m "'..message_title..'" -m "'..message_body..'"'..(DRY_RUN and " --dry-run" or ""))
 		
 		-- push
 		os.execute('git push origin master'..(DRY_RUN and " --dry-run" or ""))
