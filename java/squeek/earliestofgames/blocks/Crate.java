@@ -53,7 +53,7 @@ public class Crate extends BlockContainer
 			TileEntity tile = world.getTileEntity(x, y, z);
 			if (tile != null)
 			{
-				return GuiHelper.openGui(player, tile);
+				return GuiHelper.openGuiOfTile(player, tile);
 			}
 		}
 
