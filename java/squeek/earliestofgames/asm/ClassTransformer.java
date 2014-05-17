@@ -21,13 +21,8 @@ public class ClassTransformer implements IClassTransformer
 			ModEarliestOfGames.Log.info("Patching BlockDynamicLiquid...");
 
 			ClassNode classNode = readClassFromBytes(bytes);
-			MethodNode methodNode = findMethodNodeOfClass(classNode, isObfuscated ? "h" : "func_149813_h", isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
-			if (methodNode != null)
-			{
-				addHandleFlowIntoBlockHook(methodNode, Hooks.class, "handleFlowIntoBlock", "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z");
-			}
 			
-			patchBlockBlocksFlowCalls(classNode, isObfuscated);
+			patchBlockDynamicLiquid(classNode, isObfuscated);
 			
 			return writeClassToBytes(classNode);
 		}
@@ -60,7 +55,7 @@ public class ClassTransformer implements IClassTransformer
 		
 		method.instructions.insertBefore(targetNode, toInject);
 
-		ModEarliestOfGames.Log.info(" Patched " + method.name);
+		ModEarliestOfGames.Log.info(" Set " + method.name + " access level to public");
 	}
 	
 	private boolean isMethodNodeOfBlockBlocksFlow(MethodInsnNode methodNode, boolean isObfuscated)
@@ -69,12 +64,25 @@ public class ClassTransformer implements IClassTransformer
 		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
 		return isRightName && isRightDesc;
 	}
-	
-	private void patchBlockBlocksFlowCalls(ClassNode classNode, boolean isObfuscated)
+
+	private boolean isMethodNodeOfFlowIntoBlock(MethodInsnNode methodNode, boolean isObfuscated)
 	{
-		// blockBlocksFlow = func_149807_p
-		
+		boolean isRightName = methodNode.name.equals(isObfuscated ? "h" : "func_149813_h");
+		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
+		return isRightName && isRightDesc;
+	}
+	
+	private void patchBlockDynamicLiquid(ClassNode classNode, boolean isObfuscated)
+	{
 		MethodNode method;
+		
+		// flowIntoBlock
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "h" : "func_149813_h", isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
+		if (method != null)
+		{
+			method.access = ACC_PUBLIC;
+			ModEarliestOfGames.Log.info("  Set " + method.name + " access level to public");
+		}
 		
 		// blockBlocksFlow
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "p" : "func_149807_p", isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
@@ -112,7 +120,7 @@ public class ClassTransformer implements IClassTransformer
 			
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 			
-			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+			invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
@@ -152,7 +160,7 @@ public class ClassTransformer implements IClassTransformer
 			
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 
-			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+			invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
@@ -196,6 +204,22 @@ public class ClassTransformer implements IClassTransformer
 			invokeInstruction.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
 			
 			ModEarliestOfGames.Log.info("  Patched call of blockBlocksFlow in " + method.name);
+		}
+	}
+	
+	private void patchFlowIntoBlocksCall(MethodNode method, MethodInsnNode invokeInstruction, InsnList additionalInstructions)
+	{
+		if (invokeInstruction != null)
+		{
+			if (additionalInstructions.size() > 0)
+				method.instructions.insertBefore(invokeInstruction, additionalInstructions);
+			
+			invokeInstruction.setOpcode(INVOKESTATIC);
+			invokeInstruction.owner = Hooks.class.getName().replace('.', '/');
+			invokeInstruction.name = "onFlowIntoBlockFrom";
+			invokeInstruction.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIIII)Z";
+			
+			ModEarliestOfGames.Log.info("  Patched call of flowIntoBlocks in " + method.name);
 		}
 	}
 
