@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class CrateModel extends ModelBase
 {
-	private ModelRenderer frame = new ModelRenderer(this, 0, 0).setTextureSize(16, 16);
+	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length];
 	private float scale = 0.0625f;
 	
 	public CrateModel()
@@ -19,51 +19,25 @@ public class CrateModel extends ModelBase
 		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
-			if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
-				continue;
-			
 			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
-			int numPillars = side.offsetX != 0 ? 4 : 2;
 			
-			for (int pillarNum = 0; pillarNum < numPillars; pillarNum++)
-			{
-				double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
-				int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
-				int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
-				int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
-				
-				if (side.offsetX != 0)
-				{
-					if (pillarNum < 2)
-					{
-						sizeZ = sizeX;
-						originZ = originZ + pillarNum * (sideLength - sideWidth);
-					}
-					else
-					{
-						originZ += sideWidth;
-						sizeZ -= sideWidth*2;
-						originY = originY + (pillarNum-2) * (sideLength - sideWidth);
-						sizeY = sizeX;
-					}
-				}
-				if (side.offsetZ != 0)
-				{
-					originX += sideWidth;
-					sizeX -= sideWidth*2;
-					originY = originY + pillarNum * (sideLength - sideWidth);
-					sizeY = sizeZ;
-				}
-				
-				frame.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
-			}
+			double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
+			int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
+			int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
+			int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
+			
+			frame[side.ordinal()] = new ModelRenderer(this, 0, 0).setTextureSize(16, 16).setTextureOffset(0, 0);
+			frame[side.ordinal()].addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
 		}
 	}
 	
 	public void renderAll()
 	{
-		frame.mirror = true;
-		frame.render(scale);
+		for (ModelRenderer framePart : frame)
+		{
+			framePart.mirror = true;
+			framePart.render(scale);
+		}
 	}
 	
 	@Override

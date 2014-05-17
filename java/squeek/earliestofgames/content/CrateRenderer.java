@@ -8,7 +8,7 @@ import squeek.earliestofgames.ModInfo;
 
 public class CrateRenderer extends TileEntitySpecialRenderer
 {
-	private static final ResourceLocation crateTexture = new ResourceLocation(ModInfo.MODID_LOWER, "textures/blocks/Crate.png");
+	private static final ResourceLocation crateTexture = new ResourceLocation(ModInfo.MODID_LOWER, "textures/blocks/crateFrame.png");
 	private CrateModel crateModel = new CrateModel();
 
 	@Override
