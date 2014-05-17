@@ -11,13 +11,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.ModInfo;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.helpers.GuiHelper;
 
 public class Crate extends BlockContainer
 {
-	public static double sideWidth = 0.0125D;
+	public static double sideWidth = 0.00125D;
 	
 	protected String blockName;
 
@@ -115,7 +116,14 @@ public class Crate extends BlockContainer
 			}
 		}
 		else
-			super.addCollisionBoxesToList(world, x, y, z, collidingAABB, collidingBoundingBoxes, collidingEntity);
+		{
+			AxisAlignedBB AABB = getOuterBoundingBox(world, x, y, z);
+
+			if (AABB != null && collidingAABB.intersectsWith(AABB))
+			{
+				collidingBoundingBoxes.add(AABB);
+			}
+		}
 	}
 
 	// hack to get World.isBlockFullCube to return false so that items won't always get pushed out
@@ -126,10 +134,18 @@ public class Crate extends BlockContainer
 		return AxisAlignedBB.getAABBPool().getAABB(0D, 0D, 0D, 0D, 0D, 0D);
 	}
 
+	public AxisAlignedBB getOuterBoundingBox(World world, int x, int y, int z)
+	{
+		return AxisAlignedBB.getAABBPool().getAABB(x + minX, y + minY, z + minZ,
+													x + maxX, y + maxY, z + maxZ);
+	}
+	
 	public AxisAlignedBB getInnerBoundingBox(World world, int x, int y, int z)
 	{
-		return AxisAlignedBB.getAABBPool().getAABB(x + minX + sideWidth, y + minY + sideWidth, z + minZ + sideWidth,
-													x + maxX - sideWidth, y + maxY - sideWidth, z + maxZ - sideWidth);
+		AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB(x + minX + sideWidth, y + minY + sideWidth, z + minZ + sideWidth,
+		     													x + maxX - sideWidth, y + maxY - sideWidth, z + maxZ - sideWidth);
+		ModEarliestOfGames.Log.info(AABB.getAverageEdgeLength());
+		return AABB;
 	}
 
 	@Override
