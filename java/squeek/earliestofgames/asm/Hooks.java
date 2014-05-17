@@ -19,7 +19,7 @@ public class Hooks
 		return false;
 	}
 	
-	public static boolean doesBlockBreakFlowOf(World world, int x, int y, int z, ForgeDirection fromSide, BlockDynamicLiquid flowingBlock)
+	public static boolean doesFlowGetBlockedBy(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, ForgeDirection fromSide)
 	{
 		return true;
 	}

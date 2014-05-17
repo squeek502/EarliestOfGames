@@ -63,17 +63,40 @@ public class ClassTransformer implements IClassTransformer
 		ModEarliestOfGames.Log.info(" Patched " + method.name);
 	}
 	
+	private boolean isMethodNodeOfBlockBlocksFlow(MethodInsnNode methodNode, boolean isObfuscated)
+	{
+		return methodNode.name.equals(isObfuscated ? "p" : "func_149807_p") && methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+	}
+	
 	private void patchBlockBlocksFlowCalls(ClassNode classNode, boolean isObfuscated)
 	{
 		// blockBlocksFlow = func_149807_p
 		
 		MethodNode method;
 		
-		//method = findMethodNodeOfClass(classNode, isObfuscated ? "p" : "func_149807_p", isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		// blockBlocksFlow
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "p" : "func_149807_p", isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		if (method != null)
+		{
+			method.access = ACC_PUBLIC;
+		}
+		
+		// getOptimalFlowDirections
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "o" : "func_149808_o", isObfuscated ? "(Lafn;III)[Z" : "(Lnet/minecraft/world/World;III)[Z");
 		if (method != null)
 		{
-			findFirstInstructionOfType(method, INVOKESPECIAL);
+			MethodInsnNode invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
+			{
+				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+			}
+			if (invokeSpecial != null)
+			{
+				invokeSpecial.setOpcode(INVOKESTATIC);
+				invokeSpecial.owner = Hooks.class.getName().replace('.', '/');
+				invokeSpecial.name = "doesFlowGetBlockedBy";
+				invokeSpecial.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
+			}
 		}
 	}
 
