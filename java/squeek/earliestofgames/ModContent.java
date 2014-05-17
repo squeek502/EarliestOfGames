@@ -13,12 +13,12 @@ public class ModContent
 	public static void registerBlocks()
 	{
 		blockCrate = new Crate();
-		GameRegistry.registerBlock(blockCrate, blockCrate.blockName);
+		GameRegistry.registerBlock(blockCrate, blockCrate.getBlockName());
 	}
 	
 	public static void registerTileEntities()
 	{
-        GameRegistry.registerTileEntity(CrateTile.class, blockCrate.blockName);
+        GameRegistry.registerTileEntity(CrateTile.class, blockCrate.getBlockName());
 	}
 	
 	public static void registerHandlers()

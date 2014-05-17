@@ -1,6 +1,7 @@
 package squeek.earliestofgames.content;
 
 import java.util.List;
+import squeek.earliestofgames.filters.IFilter;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class CrateTile extends TileEntity implements IInventory
 {
@@ -18,16 +20,18 @@ public class CrateTile extends TileEntity implements IInventory
 	protected int captureCooldown = 0;
 	protected int captureCheckInterval = 8;
 
+	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
+
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
 	}
-	
+
 	public boolean isCoolingDown()
 	{
 		return captureCooldown > 0;
 	}
-	
+
 	public boolean isInventoryFull()
 	{
 		for (ItemStack itemStack : inventoryItems)
@@ -37,17 +41,17 @@ public class CrateTile extends TileEntity implements IInventory
 		}
 		return true;
 	}
-	
+
 	public boolean couldCaptureItems()
 	{
 		return !isInventoryFull();
 	}
-	
+
 	@Override
 	public void updateEntity()
 	{
 		super.updateEntity();
-		
+
 		captureCooldown--;
 
 		if (!isCoolingDown() && couldCaptureItems())
@@ -58,13 +62,13 @@ public class CrateTile extends TileEntity implements IInventory
 	{
 		boolean didCapture = false;
 		List<EntityItem> itemEntities = getItemEntitiesInside();
-		
+
 		for (EntityItem itemEntity : itemEntities)
 		{
 			// insertStackFromEntity
 			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
 		}
-		
+
 		return didCapture;
 	}
 

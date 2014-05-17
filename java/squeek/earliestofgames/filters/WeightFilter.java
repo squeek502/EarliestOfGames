@@ -6,6 +6,8 @@ import net.minecraft.item.ItemStack;
 
 public class WeightFilter implements IFilter
 {
+	float minWeight = 1f;
+	
 	public static float getItemWeight(ItemStack itemStack)
 	{
 		Block block = Block.getBlockFromItem(itemStack.getItem());
@@ -15,6 +17,6 @@ public class WeightFilter implements IFilter
 	@Override
 	public boolean passesFilter(ItemStack item)
 	{
-		return getItemWeight();
+		return getItemWeight(item) > minWeight;
 	}
 }

@@ -12,12 +12,14 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModInfo;
+import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.helpers.GuiHelper;
 
 public class Crate extends BlockContainer
 {
-	public String blockName;
 	public static double sideWidth = 0.0125D;
+	
+	protected String blockName;
 
 	public Crate()
 	{
@@ -70,11 +72,13 @@ public class Crate extends BlockContainer
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
 	{
-		if (true || collidingEntity instanceof EntityItem)
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof CrateTile && collidingEntity instanceof EntityItem)
 		{
+			EntityItem itemEntity = (EntityItem) collidingEntity;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
+				if (((CrateTile)tile).canItemPassThroughSide(side))
 					continue;
 
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
