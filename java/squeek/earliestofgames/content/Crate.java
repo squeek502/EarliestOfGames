@@ -3,6 +3,7 @@ package squeek.earliestofgames.content;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -22,10 +23,18 @@ public class Crate extends BlockContainer
 	public static double sideWidth = 0.125D;
 	
 	protected String blockName;
+	public static final Material crateMaterial = (new Material(MapColor.woodColor)
+    {
+		// doesn't block water flowing through it
+        public boolean blocksMovement()
+        {
+            return false;
+        }
+    });
 
 	public Crate()
 	{
-		super(Material.wood);
+		super(crateMaterial);
 		setBlockName(ModInfo.MODID + "." + this.getClass().getSimpleName());
 		setBlockTextureName(ModInfo.MODID + ":" + this.getClass().getSimpleName());
 	}
