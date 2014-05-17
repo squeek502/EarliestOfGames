@@ -149,8 +149,10 @@ public class ClassTransformer implements IClassTransformer
 				toInject.add(new InsnNode(ICONST_0));
 			
 				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
+				
+				method.instructions.insert(invokeSpecial, new InsnNode(POP));
 			}
-			/*
+			
 			// blockBlocksFlow call
 			invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
@@ -162,8 +164,8 @@ public class ClassTransformer implements IClassTransformer
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
-*/
-			/*
+
+			
 			// more flowIntoBlock calls
 			for (int i=0; i<4; i++)
 			{
@@ -180,8 +182,10 @@ public class ClassTransformer implements IClassTransformer
 				toInject.add(new InsnNode(byteCode));
 				
 				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
+				
+				method.instructions.insert(invokeSpecial, new InsnNode(POP));
 			}
-			*/
+			
 		}
 	}
 	

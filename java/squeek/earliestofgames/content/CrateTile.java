@@ -45,7 +45,7 @@ public class CrateTile extends TileEntity implements IInventory
 		setFilterOfSide(ForgeDirection.DOWN, down);
 
 		SizeFilter north = new SizeFilter();
-		north.maxItemSize = 0.25f;
+		north.maxItemSize = 4f;
 		setFilterOfSide(ForgeDirection.NORTH, north);
 	}
 
@@ -71,7 +71,7 @@ public class CrateTile extends TileEntity implements IInventory
 	 */
 	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay, ForgeDirection side)
 	{
-		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay);
+		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay + " side: " + side);
 
 		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
