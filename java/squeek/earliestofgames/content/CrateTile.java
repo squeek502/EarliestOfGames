@@ -1,11 +1,11 @@
 package squeek.earliestofgames.content;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.material.Material;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -64,17 +64,17 @@ public class CrateTile extends TileEntity implements IInventory
 	 */
 	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
 	{
-		ModEarliestOfGames.Log.debug("onFlowIntoBlock: "+newFlowDecay);
-		
+		ModEarliestOfGames.Log.debug("onFlowIntoBlock: " + newFlowDecay);
+
 		ForgeDirection side = findSideOfFlowingLiquid(flowingBlock, newFlowDecay);
 		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public ForgeDirection findSideOfFlowingLiquid(BlockDynamicLiquid flowingBlock, int newFlowDecay)
 	{
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
@@ -86,7 +86,9 @@ public class CrateTile extends TileEntity implements IInventory
 				try
 				{
 					// func_149804_e = getFlowDecay
-					int flowDecay = (Integer) (flowingBlock.getClass().getDeclaredMethod("func_149804_e", World.class, int.class, int.class, int.class).invoke(flowingBlock, worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ));
+					Method getFlowDecay = BlockLiquid.class.getDeclaredMethod("func_149804_e", World.class, int.class, int.class, int.class);
+					getFlowDecay.setAccessible(true);
+					int flowDecay = (Integer) getFlowDecay.invoke(flowingBlock, worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
 					if (newFlowDecay - flowDecay <= 1)
 					{
 						return side;
@@ -102,7 +104,7 @@ public class CrateTile extends TileEntity implements IInventory
 		
 		return ForgeDirection.UNKNOWN;
 	}
-	
+
 	/*
 	 * Filters
 	 */

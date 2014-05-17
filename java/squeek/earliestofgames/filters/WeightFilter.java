@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 
-public class WeightFilter implements IFilter
+public class WeightFilter extends IFilter
 {
 	public float minWeight = 1f;
 	
@@ -17,7 +17,9 @@ public class WeightFilter implements IFilter
 	@Override
 	public boolean passesFilter(ItemStack item)
 	{
-		if (item.getBlockFromItem(item.getItem()).getMaterial())
-		return item != null && getItemWeight(item) > minWeight;
+		if (super.passesFilter(item))
+			return true;
+		
+		return getItemWeight(item) > minWeight;
 	}
 }
