@@ -28,7 +28,7 @@ public class CrateRenderer extends TileEntitySpecialRenderer implements IItemRen
 
 			bindTexture(frameTexture);
 			crateModel.renderFrame();
-			crateModel.renderSides();
+			crateModel.renderSides((CrateTile) tile, this.field_147501_a.field_147553_e);
 
 			GL11.glPopMatrix();
 		}

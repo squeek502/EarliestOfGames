@@ -1,11 +1,12 @@
 package squeek.earliestofgames.content;
 
-import squeek.earliestofgames.ModContent;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.filters.IFilter;
+import squeek.earliestofgames.filters.SizeFilter;
 
 public class CrateModel extends ModelBase
 {
@@ -133,25 +134,39 @@ public class CrateModel extends ModelBase
 		}
 	}
 
-	public void renderSides()
+	public void renderSides(CrateTile tile, TextureManager textureManager)
 	{
 		int i = 0;
 		for (ModelRenderer sidePart : sides)
 		{
 			ForgeDirection side = ForgeDirection.getOrientation(i);
-			
 			if (sidePart != null)
 			{
-				if (side == ForgeDirection.UP)
+				IFilter filter = tile.filters[side.ordinal()];
+				
+				sidePart.setTextureOffset(8, 4);
+				
+				if (filter != null)
 				{
-					sidePart.rotateAngleX = (float) Math.toRadians(0D);
+					if (filter instanceof SizeFilter)
+						sidePart.setTextureOffset(8, 17);
 				}
+				
 				sidePart.render(scale);
 			}
 			i++;
 		}
-		if (sideBox != null)
-			sideBox.render(scale);
+	}
+
+	public void renderSides()
+	{
+		for (ModelRenderer sidePart : sides)
+		{
+			if (sidePart != null)
+			{
+				sidePart.render(scale);
+			}
+		}
 	}
 
 	@Override
