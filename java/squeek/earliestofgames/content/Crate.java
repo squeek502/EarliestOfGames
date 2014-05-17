@@ -65,21 +65,21 @@ public class Crate extends BlockContainer
 
 		return super.onBlockActivated(world, x, y, z, player, p_149727_6_, p_149727_7_, p_149727_8_, p_149727_9_);
 	}
-	
+
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
 	{
-		if (collidingEntity instanceof EntityItem)
+		if (true || collidingEntity instanceof EntityItem)
 		{
 			double sideWidth = 0.001D;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
 				if (side == ForgeDirection.UP)
 					continue;
-				
+
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
 				double maxX = this.maxX, maxY = this.maxY, maxZ = this.maxZ;
-				
+
 				if (side.offsetX != 0)
 				{
 					if (side.offsetX > 0)
@@ -101,16 +101,29 @@ public class Crate extends BlockContainer
 					else
 						maxZ = minZ + sideWidth;
 				}
-				
-		        AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB((double)x + minX, (double)y + minY, (double)z + minZ, (double)x + maxX, (double)y + maxY, (double)z + maxZ);
 
-		        if (AABB != null && collidingAABB.intersectsWith(AABB))
-		        {
-		            collidingBoundingBoxes.add(AABB);
-		        }
+				AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB((double) x + minX, (double) y + minY, (double) z + minZ, (double) x + maxX, (double) y + maxY, (double) z + maxZ);
+
+				if (AABB != null && collidingAABB.intersectsWith(AABB))
+				{
+					collidingBoundingBoxes.add(AABB);
+				}
 			}
 		}
 		else
 			super.addCollisionBoxesToList(world, x, y, z, collidingAABB, collidingBoundingBoxes, collidingEntity);
+	}
+
+	// hack to get World.isBlockFullCube to return false so that items won't always get pushed out
+	@Override
+	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
+	{
+		return AxisAlignedBB.getAABBPool().getAABB(0D, 0D, 0D, 0D, 0D, 0D);
+	}
+
+	@Override
+	public boolean isBlockNormalCube()
+	{
+		return false;
 	}
 }
