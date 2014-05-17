@@ -85,7 +85,10 @@ public class CrateModel extends ModelBase
 			else if (side.offsetY > 0)
 				originY = sideLength;
 			else if (side.offsetZ > 0)
-				originZ = sideLength;
+			{
+				originX = sideLength - sideWidth*2;
+				originZ = -sideLength + sideWidth*2;
+			}
 			
 			if (side == ForgeDirection.DOWN)
 			{
@@ -114,6 +117,10 @@ public class CrateModel extends ModelBase
 				//originX = sideLength - sideWidth + sideWidth/4;
 				//originZ = -sideWidth + sideWidth/4;
 			}
+			
+			originX -= side.offsetX * ((float) sideWidth/4);
+			originY -= side.offsetY * ((float) sideWidth/4);
+			originZ -= side.offsetZ * ((float) sideWidth/4);
 			
 			ModelRenderer sideModel = new ModelRenderer(this, 0, 0).setTextureSize(32, 32);
 			sideModel.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
