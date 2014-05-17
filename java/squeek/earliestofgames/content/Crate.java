@@ -71,6 +71,11 @@ public class Crate extends BlockContainer
 		return super.onBlockActivated(world, x, y, z, player, p_149727_6_, p_149727_7_, p_149727_8_, p_149727_9_);
 	}
 	
+	public AxisAlignedBB getSideBoundingBox(ForgeDirection side)
+	{
+		return getSideBoundingBox(side, 0, 0, 0);
+	}
+	
 	public AxisAlignedBB getSideBoundingBox(ForgeDirection side, double offsetX, double offsetY, double offsetZ)
 	{
 		double minX = this.minX, minY = this.minY, minZ = this.minZ;
