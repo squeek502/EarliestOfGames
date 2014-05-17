@@ -9,33 +9,65 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraftforge.common.util.Constants;
 
 public class CrateTile extends TileEntity implements IInventory
 {
-	private ItemStack[] inventoryItems;
+	protected ItemStack[] inventoryItems;
+	protected int captureCooldown = 0;
+	protected int captureCheckInterval = 8;
 
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
 	}
-
+	
+	public boolean isCoolingDown()
+	{
+		return captureCooldown > 0;
+	}
+	
+	public boolean isInventoryFull()
+	{
+		for (ItemStack itemStack : inventoryItems)
+		{
+			if (itemStack == null)
+				return false;
+		}
+		return true;
+	}
+	
+	public boolean couldCaptureItems()
+	{
+		return !isInventoryFull();
+	}
+	
 	@Override
 	public void updateEntity()
 	{
 		super.updateEntity();
+		
+		captureCooldown--;
 
-		captureItemEntitiesInside();
+		if (!isCoolingDown() && couldCaptureItems())
+			captureItemEntitiesInside();
 	}
 
 	public void captureItemEntitiesInside()
 	{
 		List<EntityItem> itemEntities = getItemEntitiesInside();
+		
+		for (EntityItem itemEntity : itemEntities)
+		{
+			// insertStackFromEntity
+			TileEntityHopper.func_145898_a(this, itemEntity);
+		}
 	}
 
 	public List<EntityItem> getItemEntitiesInside()
 	{
-		return worldObj.selectEntitiesWithinAABB(EntityItem.class, getBlockType().getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
+		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
 	}
 
 	@Override
