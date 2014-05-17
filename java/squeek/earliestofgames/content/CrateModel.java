@@ -99,7 +99,7 @@ public class CrateModel extends ModelBase
 		sides[ForgeDirection.UP.ordinal()].setTextureSize(64, 32);
 		sides[ForgeDirection.UP.ordinal()].rotateAngleX = (float) Math.toRadians(90D);
 		sides[ForgeDirection.UP.ordinal()].rotateAngleY = (float) Math.toRadians(180D);
-		
+
 		sides[ForgeDirection.NORTH.ordinal()] = new ModelRenderer(this, 8, 4);
 		sides[ForgeDirection.NORTH.ordinal()].addBox(-6F, 0F, -0.5F, 12, 12, 1);
 		sides[ForgeDirection.NORTH.ordinal()].setRotationPoint(8F, 2F, 1F);
@@ -116,7 +116,7 @@ public class CrateModel extends ModelBase
 		sides[ForgeDirection.WEST.ordinal()].setRotationPoint(1F, 2F, 8F);
 		sides[ForgeDirection.WEST.ordinal()].setTextureSize(64, 32);
 		sides[ForgeDirection.WEST.ordinal()].rotateAngleY = (float) Math.toRadians(90D);
-		
+
 		sides[ForgeDirection.EAST.ordinal()] = new ModelRenderer(this, 8, 4);
 		sides[ForgeDirection.EAST.ordinal()].addBox(-6F, 0F, -0.5F, 12, 12, 1);
 		sides[ForgeDirection.EAST.ordinal()].setRotationPoint(15F, 2F, 8F);
@@ -139,14 +139,13 @@ public class CrateModel extends ModelBase
 		for (ModelRenderer sidePart : sides)
 		{
 			ForgeDirection side = ForgeDirection.getOrientation(i);
-			if (i != 5)
-			{
-				i++;
-				continue;
-			}
 			
 			if (sidePart != null)
 			{
+				if (side == ForgeDirection.DOWN)
+				{
+					sidePart.rotateAngleX = (float) Math.toRadians(135D);
+				}
 				sidePart.render(scale);
 			}
 			i++;
@@ -159,5 +158,8 @@ public class CrateModel extends ModelBase
 	public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7)
 	{
 		super.render(par1Entity, par2, par3, par4, par5, par6, par7);
+		renderFrame();
+		renderSides();
 	}
+	
 }

@@ -172,7 +172,7 @@ public class Crate extends BlockContainer
 	@Override
 	public boolean renderAsNormalBlock()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
