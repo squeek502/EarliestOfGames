@@ -22,9 +22,14 @@ public class CrateModel extends ModelBase
 			
 			for (int pillarNum = 0; pillarNum < 2; pillarNum++)
 			{
-				frame.addBox(0f, 0f, 0f, sideWidth, sideLength, sideWidth);
+				frame.addBox(0f, 0f, 16f * pillarNum, sideWidth, sideLength, sideWidth);
 			}
 		}
+	}
+	
+	public void renderAll()
+	{
+		frame.render(scale);
 	}
 	
 	@Override

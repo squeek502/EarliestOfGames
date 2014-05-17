@@ -18,6 +18,9 @@ public class CrateRenderer extends TileEntitySpecialRenderer
 		{
 			GL11.glPushMatrix();
 			
+			GL11.glTranslated(x, y, z);
+			
+			bindTexture(crateTexture);
 			crateModel.renderAll();
 
 			GL11.glPopMatrix();

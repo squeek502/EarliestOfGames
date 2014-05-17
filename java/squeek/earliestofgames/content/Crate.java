@@ -178,18 +178,12 @@ public class Crate extends BlockContainer
 	@Override
 	public int getRenderType()
 	{
-		return CrateRenderer.modelId;
+		return -1;
 	}
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
 	{
-		return true;
-	}
-	
-	@Override
-	public boolean getUseNeighborBrightness()
-	{
-		return false;
+		return super.shouldSideBeRendered(world, x, y, z, side);
 	}
 }
