@@ -62,6 +62,7 @@ public class CrateModel extends ModelBase
 	
 	public void renderAll()
 	{
+		frame.mirror = true;
 		frame.render(scale);
 	}
 	
