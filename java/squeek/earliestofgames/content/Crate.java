@@ -1,13 +1,17 @@
 package squeek.earliestofgames.content;
 
-import squeek.earliestofgames.ModInfo;
-import squeek.earliestofgames.helpers.GuiHelper;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import squeek.earliestofgames.ModInfo;
+import squeek.earliestofgames.helpers.GuiHelper;
 
 public class Crate extends BlockContainer
 {
@@ -59,5 +63,17 @@ public class Crate extends BlockContainer
 		}
 
 		return super.onBlockActivated(world, x, y, z, player, p_149727_6_, p_149727_7_, p_149727_8_, p_149727_9_);
+	}
+	
+	@Override
+	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List collidingBoundingBoxes, Entity collidingEntity)
+	{
+		if (collidingEntity instanceof EntityItem)
+		{
+			double minX, minY, minZ, maxX, maxY, maxZ;
+			AxisAlignedBB.getAABBPool().getAABB((double)x + minX, (double)y + minY, (double)z + minZ, (double)x + maxX, (double)y + maxY, (double)z + maxZ);
+		}
+		else
+			super.addCollisionBoxesToList(world, x, y, z, aabb, collidingBoundingBoxes, collidingEntity);
 	}
 }
