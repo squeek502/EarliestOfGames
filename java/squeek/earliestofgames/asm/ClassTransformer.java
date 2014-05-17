@@ -138,16 +138,19 @@ public class ClassTransformer implements IClassTransformer
 			
 			// flowIntoBlock calls
 			MethodInsnNode invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
-			while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
+			for (int i=0; i<2; i++)
 			{
-				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+				while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
+				{
+					invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+				}
+			
+				toInject.clear();
+				toInject.add(new InsnNode(ICONST_0));
+			
+				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
 			}
-			
-			toInject.clear();
-			toInject.add(new InsnNode(ICONST_0));
-			
-			//patchFlowIntoBlockCall(method, invokeSpecial, toInject);
-			
+			/*
 			// blockBlocksFlow call
 			invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
@@ -155,11 +158,11 @@ public class ClassTransformer implements IClassTransformer
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
 
-			toInject.clear();
+			toInject = new InsnList();
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
-
+*/
 			/*
 			// more flowIntoBlock calls
 			for (int i=0; i<4; i++)
