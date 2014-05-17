@@ -67,7 +67,10 @@ public class CrateModel extends ModelBase
 	public void renderAll()
 	{
 		for (ModelRenderer framePart : frame)
+		{
+			framePart.setTextureOffset(-5, 5);
 			framePart.render(scale);
+		}
 	}
 	
 	@Override
