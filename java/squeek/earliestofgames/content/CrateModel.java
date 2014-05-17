@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class CrateModel extends ModelBase
 {
 	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length*2];
+	private ModelRenderer[] sides = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length];
 	private float scale = 0.0625f;
 	
 	public CrateModel()
@@ -48,7 +49,7 @@ public class CrateModel extends ModelBase
 						sizeY = sizeX;
 					}
 				}
-				if (side.offsetZ != 0)
+				else if (side.offsetZ != 0)
 				{
 					originX += sideWidth;
 					sizeX -= sideWidth*2;
@@ -62,14 +63,62 @@ public class CrateModel extends ModelBase
 				frame[pillarIndex++] = pillar;
 			}
 		}
+		
+		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+		{
+			if (side == ForgeDirection.UP)
+				continue;
+
+			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
+			
+			double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
+			int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
+			int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
+			int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
+			
+			if (side.offsetX != 0)
+			{
+				originX += -side.offsetX * (float) sideWidth/4;
+				sizeX /= 2;
+				originZ += sideWidth;
+				originY += sideWidth;
+				sizeZ -= sideWidth*2;
+				sizeY -= sideWidth*2;
+			}
+			else if (side.offsetY != 0)
+			{
+				originY += -side.offsetY * (float) sideWidth/4;
+				sizeY /= 2;
+				originX += sideWidth;
+				originZ += sideWidth;
+				sizeX -= sideWidth*2;
+				sizeZ -= sideWidth*2;
+			}
+			else if (side.offsetZ != 0)
+			{
+				originZ += -side.offsetZ * (float) sideWidth/4;
+				sizeZ /= 2;
+				originX += sideWidth;
+				originY += sideWidth;
+				sizeX -= sideWidth*2;
+				sizeY -= sideWidth*2;
+			}
+
+			ModelRenderer sideModel = new ModelRenderer(this, 0, 0).setTextureSize(16, 16);
+			sideModel.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
+		}
 	}
 	
 	public void renderAll()
 	{
 		for (ModelRenderer framePart : frame)
 		{
-			framePart.setTextureOffset(-5, 5);
 			framePart.render(scale);
+		}
+		for (ModelRenderer side : sides)
+		{
+			if (side != null)
+				side.render(scale);
 		}
 	}
 	
