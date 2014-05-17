@@ -3,6 +3,7 @@ package squeek.earliestofgames.asm;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.content.CrateTile;
 
 public class Hooks
@@ -16,5 +17,10 @@ public class Hooks
 			return ((CrateTile) tile).handleFlowIntoBlock(flowingBlock, newFlowDecay);
 		}
 		return false;
+	}
+	
+	public static boolean doesBlockBreakFlow(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, ForgeDirection fromSide)
+	{
+		return true;
 	}
 }

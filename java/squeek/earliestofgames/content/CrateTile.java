@@ -68,7 +68,7 @@ public class CrateTile extends TileEntity implements IInventory
 		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay);
 
 		ForgeDirection side = findSideOfFlowingLiquid(flowingBlock, newFlowDecay);
-		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
+		if (side == ForgeDirection.UNKNOWN || canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
 			return true;
 		}
