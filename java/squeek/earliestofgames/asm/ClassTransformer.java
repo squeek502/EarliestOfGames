@@ -49,9 +49,14 @@ public class ClassTransformer implements IClassTransformer
 		toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
 		toInject.add(new VarInsnNode(ILOAD, 5)); 	// newFlowDecay
 		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
-
+		LabelNode label = new LabelNode();
+		toInject.add(new JumpInsnNode(IFEQ, label));
+		toInject.add(new InsnNode(RETURN));
+		toInject.add(label);
 		
-		//toInject.add();
+		method.instructions.insertBefore(targetNode, toInject);
+
+		ModEarliestOfGames.Log.info(" Patched " + method.name);
 	}
 
 	private ClassNode readClassFromBytes(byte[] bytes)

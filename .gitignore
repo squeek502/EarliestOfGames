@@ -13,6 +13,7 @@ media/
 libs/
 stream/
 sources/
+dummy/
 
 # Tmp files
 *~
