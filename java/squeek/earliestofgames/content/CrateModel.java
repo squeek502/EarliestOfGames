@@ -77,34 +77,50 @@ public class CrateModel extends ModelBase
 		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
-			if (side == ForgeDirection.UP)
-				continue;
-
-			double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
+			double originX = 0D, originY = 0D, originZ = 0D;
+			float rotateAngleX = 0f, rotateAngleY = 0f, rotateAngleZ = 0f;
 			
-			if (side.offsetX != 0)
+			if (side.offsetX > 0)
+				originX = sideLength;
+			else if (side.offsetY > 0)
+				originY = sideLength;
+			else if (side.offsetZ > 0)
+				originZ = sideLength;
+			
+			if (side == ForgeDirection.DOWN)
 			{
-				originX += Math.abs(side.offsetX) * (float) sideWidth/4;
-				originZ += sideWidth;
-				originY += sideWidth;
-			}
-			else if (side.offsetY != 0)
-			{
-				originY += Math.abs(side.offsetY) * (float) sideWidth/4;
-				originX += sideWidth;
-				originZ += sideWidth;
-			}
-			else if (side.offsetZ != 0)
-			{
-				originZ += Math.abs(side.offsetZ) * (float) sideWidth/4;
-				originX += sideWidth;
-				originY += sideWidth;
+				rotateAngleZ = -1.570796f;
+				//originY = sideWidth;
+				//originX = sideWidth;
 			}
 
+			if (side == ForgeDirection.WEST)
+			{
+				rotateAngleY = 1.570796f*2;
+				//originX = sideLength;
+				//originX = sideLength;
+			}
+
+			if (side == ForgeDirection.NORTH)
+			{
+				rotateAngleY = 1.570796f;
+				//originX = sideWidth - sideWidth/4;
+				//originZ = sideLength + sideWidth - sideWidth/4;
+			}
+
+			if (side == ForgeDirection.SOUTH)
+			{
+				rotateAngleY = 1.570796f*3;
+				//originX = sideLength - sideWidth + sideWidth/4;
+				//originZ = -sideWidth + sideWidth/4;
+			}
+			
 			ModelRenderer sideModel = new ModelRenderer(this, 0, 0).setTextureSize(32, 32);
 			sideModel.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
-			if (side == ForgeDirection.DOWN)
-				sideModel.rotateAngleX = 1.570796f;
+			sideModel.setRotationPoint(2f, 2f, 2f);
+			sideModel.rotateAngleX = rotateAngleX;
+			sideModel.rotateAngleY = rotateAngleY;
+			sideModel.rotateAngleZ = rotateAngleZ;
 			
 			sides[side.ordinal()] = sideModel;
 		}
@@ -126,45 +142,6 @@ public class CrateModel extends ModelBase
 			ForgeDirection side = ForgeDirection.getOrientation(i);
 			if (sidePart != null)
 			{
-				if (side == ForgeDirection.DOWN)
-				{
-					sidePart.rotateAngleX = 0f;
-					sidePart.rotateAngleY = 0f;
-					sidePart.rotateAngleZ = -1.570796f;
-					sidePart.offsetY = 1f + 0.125f - 0.125f/4;
-					sidePart.offsetX = 0.125f - 0.125f/4;
-				}
-
-				if (side == ForgeDirection.WEST)
-				{
-					sidePart.rotateAngleX = 0f;
-					sidePart.rotateAngleY = 1.570796f*2;
-					sidePart.rotateAngleZ = 0f;
-					sidePart.offsetY = 0f;
-					sidePart.offsetX = 1f;
-					sidePart.offsetZ = 1f;
-				}
-
-				if (side == ForgeDirection.NORTH)
-				{
-					sidePart.rotateAngleX = 0;
-					sidePart.rotateAngleY = 1.570796f;
-					sidePart.rotateAngleZ = 0f;
-					sidePart.offsetY = 0f;
-					sidePart.offsetX = 0.125f - 0.125f/4;
-					sidePart.offsetZ = 1f + 0.125f - 0.125f/4;
-				}
-
-				if (side == ForgeDirection.SOUTH)
-				{
-					sidePart.rotateAngleX = 0;
-					sidePart.rotateAngleY = -1.570796f;
-					sidePart.rotateAngleZ = 0f;
-					sidePart.offsetY = 0f;
-					sidePart.offsetX = 1f - 0.125f + 0.125f/4;
-					sidePart.offsetZ = -0.125f + 0.125f/4;
-				}
-				
 				sidePart.render(scale);
 			}
 			i++;
