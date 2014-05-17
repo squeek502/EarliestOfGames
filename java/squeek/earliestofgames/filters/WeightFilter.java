@@ -17,6 +17,6 @@ public class WeightFilter implements IFilter
 	@Override
 	public boolean passesFilter(ItemStack item)
 	{
-		return getItemWeight(item) > minWeight;
+		return item != null && getItemWeight(item) > minWeight;
 	}
 }

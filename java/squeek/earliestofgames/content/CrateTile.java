@@ -46,6 +46,16 @@ public class CrateTile extends TileEntity implements IInventory
 		return captureCooldown > 0;
 	}
 
+	public boolean isInventoryEmpty()
+	{
+		for (ItemStack itemStack : inventoryItems)
+		{
+			if (itemStack != null)
+				return false;
+		}
+		return true;
+	}
+	
 	public boolean isInventoryFull()
 	{
 		for (ItemStack itemStack : inventoryItems)
@@ -85,24 +95,28 @@ public class CrateTile extends TileEntity implements IInventory
 		return false;
 	}
 
-	public List<ItemStack> getEscapableItemsInInventory()
+	public List<Integer> getInventorySlotsWithEscapableItems()
 	{
-		List<ItemStack> escapableItems = new ArrayList<ItemStack>();
-		for (ItemStack itemStack : inventoryItems)
+		List<Integer> escapableSlots = new ArrayList<Integer>();
+		for (int slotNum = 0; slotNum < inventoryItems.length; slotNum++)
 		{
-			if (canItemEscape(itemStack))
-				escapableItems.add(itemStack);
+			ItemStack itemStack = getStackInSlot(slotNum);
+			if (itemStack != null && canItemEscape(itemStack))
+				escapableSlots.add(slotNum);
 		}
-		return escapableItems;
+		return escapableSlots;
 	}
 
 	public boolean releaseEscapableItems()
 	{
 		boolean didItemEscape = false;
-		List<ItemStack> escapableItems = getEscapableItemsInInventory();
+		List<Integer> escapableSlots = getInventorySlotsWithEscapableItems();
 
-		for (ItemStack itemStack : escapableItems)
+		for (int slotNum : escapableSlots)
 		{
+	        EntityItem entityItem = new EntityItem(worldObj, xCoord+0.5f, yCoord+0.5f, zCoord+0.5f, getStackInSlot(slotNum));
+	        worldObj.spawnEntityInWorld(entityItem);
+	        setInventorySlotContents(slotNum, null);
 			didItemEscape = true;
 		}
 
@@ -116,7 +130,7 @@ public class CrateTile extends TileEntity implements IInventory
 
 		for (EntityItem itemEntity : itemEntities)
 		{
-			// insertStackFromEntity
+			// func_145898_a = insertStackFromEntity
 			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
 		}
 

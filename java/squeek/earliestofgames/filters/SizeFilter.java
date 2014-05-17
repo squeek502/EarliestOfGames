@@ -20,6 +20,6 @@ public class SizeFilter implements IFilter
 	@Override
 	public boolean passesFilter(ItemStack item)
 	{
-		return getItemSize(item) <= maxItemSize;
+		return item != null && getItemSize(item) <= maxItemSize;
 	}
 }
