@@ -1,5 +1,7 @@
 package squeek.earliestofgames;
 
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.MinecraftForgeClient;
 import squeek.earliestofgames.content.Crate;
 import squeek.earliestofgames.content.CrateRenderer;
 import squeek.earliestofgames.content.CrateTile;
@@ -33,6 +35,8 @@ public class ModContent
 	@SideOnly(Side.CLIENT)
 	public static void registerRenderers()
 	{
-		ClientRegistry.bindTileEntitySpecialRenderer(CrateTile.class, new CrateRenderer());
+		CrateRenderer crateRenderer = new CrateRenderer();
+		ClientRegistry.bindTileEntitySpecialRenderer(CrateTile.class, crateRenderer);
+		MinecraftForgeClient.registerItemRenderer(ItemBlock.getItemFromBlock(blockCrate), crateRenderer);
 	}
 }

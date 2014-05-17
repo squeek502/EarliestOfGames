@@ -172,7 +172,7 @@ public class Crate extends BlockContainer
 	@Override
 	public boolean renderAsNormalBlock()
 	{
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -184,7 +184,7 @@ public class Crate extends BlockContainer
 	@Override
 	public int getRenderType()
 	{
-		return -1;
+		return 22;
 	}
 	
 	@Override
