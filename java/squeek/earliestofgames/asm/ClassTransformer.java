@@ -34,14 +34,15 @@ public class ClassTransformer implements IClassTransformer
 	
 	private void addHandleFlowIntoBlockHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
 	{
-		// equivalent to:
-		if (Hooks.handleFlowIntoBlock(null, 0, 0, 0, 0))
-			return;
-		
 		AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
 		
 		InsnList toInject = new InsnList();
 
+		/*
+		// equivalent to:
+		if (Hooks.handleFlowIntoBlock(null, 0, 0, 0, 0))
+			return;
+		*/
 		toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
 		toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
 		toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
