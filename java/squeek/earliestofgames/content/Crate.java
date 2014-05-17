@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModInfo;
 import squeek.earliestofgames.helpers.GuiHelper;
 
@@ -66,14 +67,50 @@ public class Crate extends BlockContainer
 	}
 	
 	@Override
-	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List collidingBoundingBoxes, Entity collidingEntity)
+	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
 	{
 		if (collidingEntity instanceof EntityItem)
 		{
-			double minX, minY, minZ, maxX, maxY, maxZ;
-			AxisAlignedBB.getAABBPool().getAABB((double)x + minX, (double)y + minY, (double)z + minZ, (double)x + maxX, (double)y + maxY, (double)z + maxZ);
+			double sideWidth = 0.001D;
+			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+			{
+				if (side == ForgeDirection.UP)
+					continue;
+				
+				double minX = this.minX, minY = this.minY, minZ = this.minZ;
+				double maxX = this.maxX, maxY = this.maxY, maxZ = this.maxZ;
+				
+				if (side.offsetX != 0)
+				{
+					if (side.offsetX > 0)
+						minX = maxX - sideWidth;
+					else
+						maxX = minX + sideWidth;
+				}
+				if (side.offsetY != 0)
+				{
+					if (side.offsetY > 0)
+						minY = maxY - sideWidth;
+					else
+						maxY = minY + sideWidth;
+				}
+				if (side.offsetZ != 0)
+				{
+					if (side.offsetZ > 0)
+						minZ = maxZ - sideWidth;
+					else
+						maxZ = minZ + sideWidth;
+				}
+				
+		        AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB((double)x + minX, (double)y + minY, (double)z + minZ, (double)x + maxX, (double)y + maxY, (double)z + maxZ);
+
+		        if (AABB != null && collidingAABB.intersectsWith(AABB))
+		        {
+		            collidingBoundingBoxes.add(AABB);
+		        }
+			}
 		}
 		else
-			super.addCollisionBoxesToList(world, x, y, z, aabb, collidingBoundingBoxes, collidingEntity);
+			super.addCollisionBoxesToList(world, x, y, z, collidingAABB, collidingBoundingBoxes, collidingEntity);
 	}
 }
