@@ -69,6 +69,36 @@ public class Crate extends BlockContainer
 
 		return super.onBlockActivated(world, x, y, z, player, p_149727_6_, p_149727_7_, p_149727_8_, p_149727_9_);
 	}
+	
+	public AxisAlignedBB getSideBoundingBox(ForgeDirection side, double offsetX, double offsetY, double offsetZ)
+	{
+		double minX = this.minX, minY = this.minY, minZ = this.minZ;
+		double maxX = this.maxX, maxY = this.maxY, maxZ = this.maxZ;
+
+		if (side.offsetX != 0)
+		{
+			if (side.offsetX > 0)
+				minX = maxX - sideWidth;
+			else
+				maxX = minX + sideWidth;
+		}
+		if (side.offsetY != 0)
+		{
+			if (side.offsetY > 0)
+				minY = maxY - sideWidth;
+			else
+				maxY = minY + sideWidth;
+		}
+		if (side.offsetZ != 0)
+		{
+			if (side.offsetZ > 0)
+				minZ = maxZ - sideWidth;
+			else
+				maxZ = minZ + sideWidth;
+		}
+		
+		return AxisAlignedBB.getAABBPool().getAABB(offsetX + minX, offsetY + minY, offsetZ + minZ, offsetX + maxX, offsetY + maxY, offsetZ + maxZ);
+	}
 
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
@@ -87,32 +117,7 @@ public class Crate extends BlockContainer
 				if (((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
 					continue;
 
-				double minX = this.minX, minY = this.minY, minZ = this.minZ;
-				double maxX = this.maxX, maxY = this.maxY, maxZ = this.maxZ;
-
-				if (side.offsetX != 0)
-				{
-					if (side.offsetX > 0)
-						minX = maxX - sideWidth;
-					else
-						maxX = minX + sideWidth;
-				}
-				if (side.offsetY != 0)
-				{
-					if (side.offsetY > 0)
-						minY = maxY - sideWidth;
-					else
-						maxY = minY + sideWidth;
-				}
-				if (side.offsetZ != 0)
-				{
-					if (side.offsetZ > 0)
-						minZ = maxZ - sideWidth;
-					else
-						maxZ = minZ + sideWidth;
-				}
-
-				AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB((double) x + minX, (double) y + minY, (double) z + minZ, (double) x + maxX, (double) y + maxY, (double) z + maxZ);
+				AxisAlignedBB AABB = getSideBoundingBox(side, x, y, z);
 
 				if (AABB != null && collidingAABB.intersectsWith(AABB))
 				{
@@ -156,5 +161,17 @@ public class Crate extends BlockContainer
 	public boolean isBlockNormalCube()
 	{
 		return false;
+	}
+	
+	@Override
+	public boolean renderAsNormalBlock()
+	{
+		return false;
+	}
+	
+	@Override
+	public int getRenderType()
+	{
+		return CrateRenderer.modelId;
 	}
 }

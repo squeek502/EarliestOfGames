@@ -1,10 +1,14 @@
 package squeek.earliestofgames;
 
 import squeek.earliestofgames.content.Crate;
+import squeek.earliestofgames.content.CrateRenderer;
 import squeek.earliestofgames.content.CrateTile;
 import squeek.earliestofgames.helpers.GuiHelper;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ModContent
 {
@@ -24,5 +28,11 @@ public class ModContent
 	public static void registerHandlers()
 	{
         NetworkRegistry.INSTANCE.registerGuiHandler(ModEarliestOfGames.instance, new GuiHelper());
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void registerRenderers()
+	{
+		RenderingRegistry.registerBlockHandler(new CrateRenderer());
 	}
 }
