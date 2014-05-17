@@ -162,7 +162,8 @@ public class CrateModel extends ModelBase
 				}
 				else
 				{
-					sidePart.render(scale);
+					if (side != ForgeDirection.NORTH)
+						sidePart.render(scale);
 				}
 			}
 			i++;
