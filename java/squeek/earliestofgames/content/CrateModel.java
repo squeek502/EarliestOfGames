@@ -78,7 +78,7 @@ public class CrateModel extends ModelBase
 			
 			if (side.offsetX != 0)
 			{
-				originX += -side.offsetX * (float) sideWidth/4;
+				originX += Math.abs(side.offsetX) * (float) sideWidth/4;
 				sizeX /= 2;
 				originZ += sideWidth;
 				originY += sideWidth;
@@ -87,7 +87,7 @@ public class CrateModel extends ModelBase
 			}
 			else if (side.offsetY != 0)
 			{
-				originY += -side.offsetY * (float) sideWidth/4;
+				originY += Math.abs(side.offsetY) * (float) sideWidth/4;
 				sizeY /= 2;
 				originX += sideWidth;
 				originZ += sideWidth;
@@ -96,7 +96,7 @@ public class CrateModel extends ModelBase
 			}
 			else if (side.offsetZ != 0)
 			{
-				originZ += -side.offsetZ * (float) sideWidth/4;
+				originZ += Math.abs(side.offsetZ) * (float) sideWidth/4;
 				sizeZ /= 2;
 				originX += sideWidth;
 				originY += sideWidth;
@@ -106,15 +106,21 @@ public class CrateModel extends ModelBase
 
 			ModelRenderer sideModel = new ModelRenderer(this, 0, 0).setTextureSize(16, 16);
 			sideModel.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
+			
+			sides[side.ordinal()] = sideModel;
 		}
 	}
 	
-	public void renderAll()
+	public void renderFrame()
 	{
 		for (ModelRenderer framePart : frame)
 		{
 			framePart.render(scale);
 		}
+	}
+	
+	public void renderSides()
+	{
 		for (ModelRenderer side : sides)
 		{
 			if (side != null)
