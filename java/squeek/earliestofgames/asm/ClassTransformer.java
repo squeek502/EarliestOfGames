@@ -1,14 +1,14 @@
 package squeek.earliestofgames.asm;
 
 import static org.objectweb.asm.Opcodes.*;
+import java.io.IOException;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
+import cpw.mods.fml.common.asm.transformers.AccessTransformer;
 import squeek.earliestofgames.ModEarliestOfGames;
+import squeek.earliestofgames.ModInfo;
 
 public class ClassTransformer implements IClassTransformer
 {

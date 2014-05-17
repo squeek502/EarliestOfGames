@@ -37,10 +37,16 @@ public class CrateTile extends TileEntity implements IInventory
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
+		
 		setFilterOfSide(ForgeDirection.UP, new SizeFilter());
+		
 		SizeFilter down = new SizeFilter();
 		down.maxItemSize = 0.5f;
 		setFilterOfSide(ForgeDirection.DOWN, down);
+
+		SizeFilter north = new SizeFilter();
+		north.maxItemSize = 0.25f;
+		setFilterOfSide(ForgeDirection.NORTH, north);
 	}
 
 	/*
