@@ -4,7 +4,7 @@ import squeek.earliestofgames.content.Crate;
 import squeek.earliestofgames.content.CrateRenderer;
 import squeek.earliestofgames.content.CrateTile;
 import squeek.earliestofgames.helpers.GuiHelper;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -33,6 +33,6 @@ public class ModContent
 	@SideOnly(Side.CLIENT)
 	public static void registerRenderers()
 	{
-		RenderingRegistry.registerBlockHandler(new CrateRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(CrateTile.class, new CrateRenderer());
 	}
 }

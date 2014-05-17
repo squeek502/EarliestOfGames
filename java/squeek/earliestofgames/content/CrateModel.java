@@ -8,14 +8,22 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class CrateModel extends ModelBase
 {
-	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length*2];
+	private ModelRenderer frame = new ModelRenderer(this, 0, 0);
 	private float scale = 0.0625f;
 	
 	public CrateModel()
 	{
+		int sideWidth = (int) (ModContent.blockCrate.sideWidth / scale);
+		int sideLength = (int) (1f / scale);
+		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
 			ModContent.blockCrate.getSideBoundingBox(side);
+			
+			for (int pillarNum = 0; pillarNum < 2; pillarNum++)
+			{
+				frame.addBox(0f, 0f, 0f, sideWidth, sideLength, sideWidth);
+			}
 		}
 	}
 	

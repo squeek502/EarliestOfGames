@@ -1,51 +1,26 @@
 package squeek.earliestofgames.content;
 
-import squeek.earliestofgames.ModContent;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import squeek.earliestofgames.ModInfo;
 
-public class CrateRenderer implements ISimpleBlockRenderingHandler
+public class CrateRenderer extends TileEntitySpecialRenderer
 {
-    public static int modelId = RenderingRegistry.getNextAvailableRenderId();
+	private static final ResourceLocation crateTexture = new ResourceLocation(ModInfo.MODID_LOWER, "textures/blocks/Crate.png");
+	private CrateModel crateModel = new CrateModel();
 
 	@Override
-	public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer)
+	public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float timer)
 	{
-		
-	}
-
-	@Override
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
-	{
-		if (modelId == this.modelId)
+		if (tile != null && tile instanceof CrateTile)
 		{
-			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
-			{
-				if (side == ForgeDirection.UP)
-					continue;
-				
-				AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side, 0D, 0D, 0D);
-				renderer.setRenderBounds(sideBounds.minX, sideBounds.minY, sideBounds.minZ, sideBounds.maxX, sideBounds.maxY, sideBounds.maxZ);
-				renderer.renderStandardBlock(block, x, y, z);
-			}
+			GL11.glPushMatrix();
+			
+			crateModel.renderAll();
+
+			GL11.glPopMatrix();
 		}
-		return true;
-	}
-
-	@Override
-	public boolean shouldRender3DInInventory(int modelId)
-	{
-		return true;
-	}
-
-	@Override
-	public int getRenderId()
-	{
-		return modelId;
 	}
 }
