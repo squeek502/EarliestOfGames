@@ -16,6 +16,31 @@ public class CrateModel extends ModelBase
 	
 	public CrateModel()
 	{
+
+		frame[0] = new ModelRenderer(this, 0, 0);
+		frame[0].addBox(0F, 0F, 0F, 2, 16, 2);
+		frame[0].setRotationPoint(16F, 0F, 0F);
+		frame[0].setTextureSize(64, 32);
+		frame[0].rotateAngleY = (float) Math.toRadians(270D);
+
+		frame[1] = new ModelRenderer(this, 0, 0);
+		frame[1].addBox(0F, 0F, 0F, 2, 16, 2);
+		frame[1].setRotationPoint(0F, 0F, 0F);
+		frame[1].setTextureSize(64, 32);
+
+		frame[2] = new ModelRenderer(this, 0, 0);
+		frame[2].addBox(0F, 0F, 0F, 2, 16, 2);
+		frame[2].setRotationPoint(0F, 0F, 16F);
+		frame[2].setTextureSize(64, 32);
+		frame[2].rotateAngleY = (float) Math.toRadians(90D);
+
+		frame[3] = new ModelRenderer(this, 0, 0);
+		frame[3].addBox(0F, 0F, 0F, 2, 16, 2);
+		frame[3].setRotationPoint(16F, 0F, 16F);
+		frame[3].setTextureSize(64, 32);
+		frame[3].rotateAngleY = (float) Math.toRadians(180D);
+		
+		/*
 		int sideWidth = (int) (ModContent.blockCrate.sideWidth / scale);
 		int sideLength = (int) (1f / scale);
 		int pillarIndex = 0;
@@ -131,13 +156,15 @@ public class CrateModel extends ModelBase
 			
 			sides[side.ordinal()] = sideModel;
 		}
+		*/
 	}
 	
 	public void renderFrame()
 	{
 		for (ModelRenderer framePart : frame)
 		{
-			framePart.render(scale);
+			if (framePart != null)
+				framePart.render(scale);
 		}
 	}
 	
