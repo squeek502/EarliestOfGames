@@ -1,8 +1,10 @@
 package squeek.earliestofgames.asm;
 
+import static org.objectweb.asm.Opcodes.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -22,7 +24,7 @@ public class ClassTransformer implements IClassTransformer
 			MethodNode methodNode = findMethodNodeOfClass(classNode, isObfuscated ? "h" : "func_149813_h", isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
 			if (methodNode != null)
 			{
-				addHandleFlowIntoBlockHook(methodNode, Hooks.class, "handleFlowIntoBlock", "(Lnet/minecraft/world/World;IIII)Z");
+				addHandleFlowIntoBlockHook(methodNode, Hooks.class, "handleFlowIntoBlock", "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z");
 				return writeClassToBytes(classNode);
 			}
 		}
@@ -32,9 +34,24 @@ public class ClassTransformer implements IClassTransformer
 	
 	private void addHandleFlowIntoBlockHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
 	{
+		// equivalent to:
+		if (Hooks.handleFlowIntoBlock(null, 0, 0, 0, 0))
+			return;
+		
 		AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
 		
 		InsnList toInject = new InsnList();
+
+		toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
+		toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
+		toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
+		toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
+		toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
+		toInject.add(new VarInsnNode(ILOAD, 5)); 	// newFlowDecay
+		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
+
+		
+		//toInject.add();
 	}
 
 	private ClassNode readClassFromBytes(byte[] bytes)
