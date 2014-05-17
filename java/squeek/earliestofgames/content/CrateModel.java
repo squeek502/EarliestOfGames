@@ -88,55 +88,6 @@ public class CrateModel extends ModelBase
 		frame[11].rotateAngleY = (float) Math.toRadians(270D);
 		
 		/*
-		int sideWidth = (int) (ModContent.blockCrate.sideWidth / scale);
-		int sideLength = (int) (1f / scale);
-		int pillarIndex = 0;
-		
-		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
-		{
-			if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
-				continue;
-			
-			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
-			int numPillars = side.offsetX != 0 ? 4 : 2;
-			
-			for (int pillarNum = 0; pillarNum < numPillars; pillarNum++)
-			{
-				double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
-				int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
-				int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
-				int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
-				
-				if (side.offsetX != 0)
-				{
-					if (pillarNum < 2)
-					{
-						sizeZ = sizeX;
-						originZ = originZ + pillarNum * (sideLength - sideWidth);
-					}
-					else
-					{
-						originZ += sideWidth;
-						sizeZ -= sideWidth*2;
-						originY = originY + (pillarNum-2) * (sideLength - sideWidth);
-						sizeY = sizeX;
-					}
-				}
-				else if (side.offsetZ != 0)
-				{
-					originX += sideWidth;
-					sizeX -= sideWidth*2;
-					originY = originY + pillarNum * (sideLength - sideWidth);
-					sizeY = sizeZ;
-				}
-				
-				ModelRenderer pillar = new ModelRenderer(this, 0, 0).setTextureSize(16, 16);
-				pillar.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
-				
-				frame[pillarIndex++] = pillar;
-			}
-		}
-
 		AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(ForgeDirection.EAST);
 		
 		int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
