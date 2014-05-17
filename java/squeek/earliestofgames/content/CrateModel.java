@@ -12,7 +12,7 @@ public class CrateModel extends ModelBase
 {
 	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length * 2];
 	private ModelRenderer[] sides = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length];
-	private ModelRenderer sideSizeFilter;
+	private ModelRenderer[] sizeFilters = new ModelRenderer[3];
 	private float scale = 0.0625f;
 
 	public CrateModel()
@@ -123,10 +123,18 @@ public class CrateModel extends ModelBase
 		sides[ForgeDirection.EAST.ordinal()].setRotationPoint(15F, 2F, 8F);
 		sides[ForgeDirection.EAST.ordinal()].setTextureSize(64, 32);
 		sides[ForgeDirection.EAST.ordinal()].rotateAngleY = (float) Math.toRadians(270D);
+
+		sizeFilters[0] = new ModelRenderer(this, 34, 4);
+		sizeFilters[0].addBox(-6F, 0F, -0.5F, 12, 12, 1);
+		sizeFilters[0].setTextureSize(64, 32);
 		
-		sideSizeFilter = new ModelRenderer(this, 8, 17);
-		sideSizeFilter.addBox(-6F, 0F, -0.5F, 12, 12, 1);
-		sideSizeFilter.setTextureSize(64, 32);
+		sizeFilters[1] = new ModelRenderer(this, 8, 17);
+		sizeFilters[1].addBox(-6F, 0F, -0.5F, 12, 12, 1);
+		sizeFilters[1].setTextureSize(64, 32);
+		
+		sizeFilters[2] = new ModelRenderer(this, 34, 17);
+		sizeFilters[2].addBox(-6F, 0F, -0.5F, 12, 12, 1);
+		sizeFilters[2].setTextureSize(64, 32);
 	}
 
 	public void renderFrame()
@@ -152,12 +160,13 @@ public class CrateModel extends ModelBase
 				{
 					if (filter instanceof SizeFilter)
 					{
-						sideSizeFilter.setRotationPoint(sidePart.rotationPointX, sidePart.rotationPointY, sidePart.rotationPointZ);
-						sideSizeFilter.rotateAngleX = sidePart.rotateAngleX;
-						sideSizeFilter.rotateAngleY = sidePart.rotateAngleY;
-						sideSizeFilter.rotateAngleZ = sidePart.rotateAngleZ;
+						ModelRenderer sizeFilter = ((SizeFilter) filter).maxItemSize > 1f ? sizeFilters[2] : (((SizeFilter) filter).maxItemSize <= 0.5f ? sizeFilters[0] : sizeFilters[1]);
+						sizeFilter.setRotationPoint(sidePart.rotationPointX, sidePart.rotationPointY, sidePart.rotationPointZ);
+						sizeFilter.rotateAngleX = sidePart.rotateAngleX;
+						sizeFilter.rotateAngleY = sidePart.rotateAngleY;
+						sizeFilter.rotateAngleZ = sidePart.rotateAngleZ;
 						
-						sideSizeFilter.render(scale);
+						sizeFilter.render(scale);
 					}
 				}
 				else
