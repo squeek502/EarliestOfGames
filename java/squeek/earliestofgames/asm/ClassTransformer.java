@@ -92,10 +92,29 @@ public class ClassTransformer implements IClassTransformer
 			}
 			if (invokeSpecial != null)
 			{
+				int l = 0;
+				
+				
+				// equivalent to:
+				Hooks.doesFlowGetBlockedBy(null, null, 0, 0, 0, (l+2) % 4 + 2);
+				
+				InsnList toInject = new InsnList();
+				
+				toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
+				toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
+				toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
+				toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
+				toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
+				toInject.add(new VarInsnNode(ILOAD, 5)); 	// newFlowDecay
+				
+				method.instructions.insertBefore(invokeSpecial, toInject);
+				
 				invokeSpecial.setOpcode(INVOKESTATIC);
 				invokeSpecial.owner = Hooks.class.getName().replace('.', '/');
 				invokeSpecial.name = "doesFlowGetBlockedBy";
 				invokeSpecial.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
+				
+				method.instructions.insert(invokeSpecial, new InsnNode(POP));
 			}
 		}
 	}
@@ -148,6 +167,16 @@ public class ClassTransformer implements IClassTransformer
 				return instruction;
 			
 			instruction = startInstruction.getNext();
+		}
+		return null;
+	}
+	
+	private LocalVariableNode findLocalVariable(MethodNode method, String name, String desc)
+	{
+		for (LocalVariableNode localVar : method.localVariables)
+		{
+			if (localVar != null && localVar.name.equals(name) && localVar.desc.equals(desc))
+				return localVar;
 		}
 		return null;
 	}
