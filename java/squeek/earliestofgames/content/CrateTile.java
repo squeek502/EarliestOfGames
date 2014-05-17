@@ -20,7 +20,7 @@ public class CrateTile extends TileEntity implements IInventory
 {
 	protected ItemStack[] inventoryItems;
 	protected int captureCooldown = 0;
-	protected int captureCheckInterval = 8;
+	protected int captureTickInterval = 8;
 
 	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
 
@@ -95,8 +95,8 @@ public class CrateTile extends TileEntity implements IInventory
 
 		if (!isCoolingDown() && couldCaptureItems())
 		{
-			//captureItemsInside();
-			captureCooldown = captureCheckInterval;
+			captureItemsInside();
+			captureCooldown = captureTickInterval;
 		}
 	}
 

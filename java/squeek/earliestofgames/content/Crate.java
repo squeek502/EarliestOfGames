@@ -18,7 +18,7 @@ import squeek.earliestofgames.helpers.GuiHelper;
 
 public class Crate extends BlockContainer
 {
-	public static double sideWidth = 0.00125D;
+	public static double sideWidth = 0.0125D;
 	
 	protected String blockName;
 
@@ -73,13 +73,18 @@ public class Crate extends BlockContainer
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
 	{
+		// hack...
+		// this function is called with a null entity in World.isBlockFullCube
+		if (collidingEntity == null)
+			return;
+		
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile != null && tile instanceof CrateTile && collidingEntity instanceof EntityItem)
 		{
 			EntityItem itemEntity = (EntityItem) collidingEntity;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				if (side == ForgeDirection.UP || ((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
+				if (((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
 					continue;
 
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
@@ -131,7 +136,7 @@ public class Crate extends BlockContainer
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
 	{
-		return AxisAlignedBB.getAABBPool().getAABB(0D, 0D, 0D, 0D, 0D, 0D);
+		return null;
 	}
 
 	public AxisAlignedBB getOuterBoundingBox(World world, int x, int y, int z)
@@ -144,7 +149,6 @@ public class Crate extends BlockContainer
 	{
 		AxisAlignedBB AABB = AxisAlignedBB.getAABBPool().getAABB(x + minX + sideWidth, y + minY + sideWidth, z + minZ + sideWidth,
 		     													x + maxX - sideWidth, y + maxY - sideWidth, z + maxZ - sideWidth);
-		ModEarliestOfGames.Log.info(AABB.getAverageEdgeLength());
 		return AABB;
 	}
 
