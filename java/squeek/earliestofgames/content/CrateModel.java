@@ -19,23 +19,46 @@ public class CrateModel extends ModelBase
 		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
-			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
+			if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
+				continue;
 			
-			for (int pillarNum = 0; pillarNum < 2; pillarNum++)
+			// temp
+			if (side == ForgeDirection.NORTH || side == ForgeDirection.SOUTH)
+				continue;
+			
+			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
+			int numPillars = side.offsetX != 0 ? 4 : 2;
+			
+			for (int pillarNum = 0; pillarNum < numPillars; pillarNum++)
 			{
 				double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
+				int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
+				int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
+				int sizeZ = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
 				
 				if (side.offsetX != 0)
-					originZ = originZ + pillarNum * (sideLength - sideWidth);
+				{
+					if (pillarNum < 2)
+					{
+						sizeZ = sizeX;
+						originZ = originZ + pillarNum * (sideLength - sideWidth);
+					}
+					else
+					{
+						originZ += sideWidth;
+						sizeZ -= sideWidth*2;
+						originY = originY + (pillarNum-2) * (sideLength - sideWidth);
+						int oldSizeY = sizeY;
+						sizeY = sizeX;
+						//sizeX = oldSizeY;
+					}
+				}
 				if (side.offsetY != 0)
 					originX = originX + pillarNum * (sideLength - sideWidth);
 				if (side.offsetZ != 0)
 					originY = originY + pillarNum * (sideLength - sideWidth);
 				
-				frame.addBox((float) originX, (float) originY, (float) originZ, 
-				             (int) ((sideBounds.maxX-sideBounds.minX) / scale), 
-				             (int) ((sideBounds.maxY-sideBounds.minY) / scale), 
-				             (int) ((sideBounds.maxY-sideBounds.minY) / scale));
+				frame.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
 			}
 		}
 	}
