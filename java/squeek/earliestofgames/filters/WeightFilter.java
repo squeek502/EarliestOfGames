@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 
 public class WeightFilter implements IFilter
 {
-	float minWeight = 1f;
+	public float minWeight = 1f;
 	
 	public static float getItemWeight(ItemStack itemStack)
 	{

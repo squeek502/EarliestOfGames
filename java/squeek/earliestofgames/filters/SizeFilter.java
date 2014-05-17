@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 public class SizeFilter implements IFilter
 {
-	float maxItemSize = 1f;
+	public float maxItemSize = 1f;
 
 	public static float getItemSize(ItemStack itemStack)
 	{

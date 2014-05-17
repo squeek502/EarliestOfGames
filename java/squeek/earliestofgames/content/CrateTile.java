@@ -2,7 +2,6 @@ package squeek.earliestofgames.content;
 
 import java.util.ArrayList;
 import java.util.List;
-import squeek.earliestofgames.filters.IFilter;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +13,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.filters.IFilter;
+import squeek.earliestofgames.filters.SizeFilter;
 
 public class CrateTile extends TileEntity implements IInventory
 {
@@ -26,6 +27,10 @@ public class CrateTile extends TileEntity implements IInventory
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
+		setFilterOfSide(ForgeDirection.UP, new SizeFilter());
+		SizeFilter down = new SizeFilter();
+		down.maxItemSize = 0.5f;
+		setFilterOfSide(ForgeDirection.DOWN, down);
 	}
 
 	public void setFilterOfSide(ForgeDirection side, IFilter filter)
@@ -33,7 +38,17 @@ public class CrateTile extends TileEntity implements IInventory
 		if (side == ForgeDirection.UNKNOWN)
 			return;
 
-		filters[side.ordinal()] = filter;
+		if (filters[side.ordinal()] != filter)
+		{
+			filters[side.ordinal()] = filter;
+			onFilterChanged(side);
+		}
+	}
+	
+	protected void onFilterChanged(ForgeDirection side)
+	{
+		if (side != ForgeDirection.UP)
+			releaseEscapableItems();
 	}
 
 	public boolean canItemPassThroughSide(ItemStack item, ForgeDirection side)
@@ -114,10 +129,7 @@ public class CrateTile extends TileEntity implements IInventory
 
 		for (int slotNum : escapableSlots)
 		{
-	        EntityItem entityItem = new EntityItem(worldObj, xCoord+0.5f, yCoord+0.5f, zCoord+0.5f, getStackInSlot(slotNum));
-	        worldObj.spawnEntityInWorld(entityItem);
-	        setInventorySlotContents(slotNum, null);
-			didItemEscape = true;
+			didItemEscape = didItemEscape || releaseItemFromSlot(slotNum);
 		}
 
 		return didItemEscape;
@@ -130,6 +142,9 @@ public class CrateTile extends TileEntity implements IInventory
 
 		for (EntityItem itemEntity : itemEntities)
 		{
+			if (canItemEscape(itemEntity.getEntityItem()))
+				continue;
+			
 			// func_145898_a = insertStackFromEntity
 			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
 		}
@@ -140,6 +155,30 @@ public class CrateTile extends TileEntity implements IInventory
 	public List<EntityItem> getItemEntitiesInside()
 	{
 		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
+	}
+	
+	public boolean releaseItemFromSlot(int slotNum)
+	{
+		ItemStack itemStack = getStackInSlot(slotNum);
+		if (itemStack != null)
+		{
+	        EntityItem entityItem = new EntityItem(worldObj, xCoord+0.5f, yCoord+0.5f, zCoord+0.5f, getStackInSlot(slotNum));
+	        worldObj.spawnEntityInWorld(entityItem);
+	        setInventorySlotContents(slotNum, null);
+	        return true;
+		}
+		return false;
+	}
+	
+	protected void onSlotFilled(int slotNum)
+	{
+		if (canItemEscape(getStackInSlot(slotNum)))
+			releaseItemFromSlot(slotNum);
+	}
+	
+	protected void onSlotEmptied(int slotNum)
+	{
+		
 	}
 
 	@Override
@@ -184,10 +223,19 @@ public class CrateTile extends TileEntity implements IInventory
 	@Override
 	public void setInventorySlotContents(int slotNum, ItemStack itemStack)
 	{
+		if (slotNum >= getSizeInventory() || slotNum < 0)
+			return;
+		
+		boolean wasEmpty = inventoryItems[slotNum] == null;
 		inventoryItems[slotNum] = itemStack;
 
 		if (itemStack != null && itemStack.stackSize > getInventoryStackLimit())
 			itemStack.stackSize = getInventoryStackLimit();
+		
+		if (wasEmpty && itemStack != null)
+			onSlotFilled(slotNum);
+		else if (!wasEmpty && itemStack == null)
+			onSlotEmptied(slotNum);
 
 		markDirty();
 	}
