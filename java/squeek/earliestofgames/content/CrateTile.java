@@ -2,7 +2,9 @@ package squeek.earliestofgames.content;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
@@ -13,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModEarliestOfGames;
@@ -63,12 +66,41 @@ public class CrateTile extends TileEntity implements IInventory
 	{
 		ModEarliestOfGames.Log.debug("onFlowIntoBlock: "+newFlowDecay);
 		
-		if (flowingBlock.getMaterial() == Material.water)
+		ForgeDirection side = findSideOfFlowingLiquid(flowingBlock, newFlowDecay);
+		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
-			
+			return true;
 		}
 		
 		return false;
+	}
+	
+	public ForgeDirection findSideOfFlowingLiquid(BlockDynamicLiquid flowingBlock, int newFlowDecay)
+	{
+		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+		{
+			Block blockOnSide = worldObj.getBlock(xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
+			
+			if (blockOnSide != null && blockOnSide == flowingBlock)
+			{
+				try
+				{
+					// func_149804_e = getFlowDecay
+					int flowDecay = (Integer) (flowingBlock.getClass().getDeclaredMethod("func_149804_e", World.class, int.class, int.class, int.class).invoke(flowingBlock, worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ));
+					if (newFlowDecay - flowDecay <= 1)
+					{
+						return side;
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+		
+		return ForgeDirection.UNKNOWN;
 	}
 	
 	/*
@@ -95,11 +127,6 @@ public class CrateTile extends TileEntity implements IInventory
 	public boolean canItemPassThroughSide(ItemStack item, ForgeDirection side)
 	{
 		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(item);
-	}
-	
-	public boolean canLiquidPassThroughSide(BlockLiquid flowingBlock, ForgeDirection side)
-	{
-		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(flowingBlock);
 	}
 
 	/*

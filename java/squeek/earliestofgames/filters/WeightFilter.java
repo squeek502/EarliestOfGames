@@ -17,6 +17,7 @@ public class WeightFilter implements IFilter
 	@Override
 	public boolean passesFilter(ItemStack item)
 	{
+		if (item.getBlockFromItem(item.getItem()).getMaterial())
 		return item != null && getItemWeight(item) > minWeight;
 	}
 }
