@@ -92,20 +92,22 @@ public class ClassTransformer implements IClassTransformer
 			}
 			if (invokeSpecial != null)
 			{
-				int l = 0;
-				
-				
+				/*
 				// equivalent to:
 				Hooks.doesFlowGetBlockedBy(null, null, 0, 0, 0, (l+2) % 4 + 2);
+				*/
 				
 				InsnList toInject = new InsnList();
 				
-				toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
-				toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
-				toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
-				toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
-				toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
-				toInject.add(new VarInsnNode(ILOAD, 5)); 	// newFlowDecay
+				LocalVariableNode lVar = findLocalVariable(method, "l", "I");
+			    
+				toInject.add(new VarInsnNode(ILOAD, lVar.index)); 	// l
+				toInject.add(new InsnNode(ICONST_2)); 				// 2
+				toInject.add(new InsnNode(IADD)); 					// l+2
+				toInject.add(new InsnNode(ICONST_4)); 				// 4
+				toInject.add(new InsnNode(IREM)); 					// (l+2) % 4
+				toInject.add(new InsnNode(ICONST_2)); 				// 2
+				toInject.add(new InsnNode(IADD)); 					// (l+2) % 4 + 2
 				
 				method.instructions.insertBefore(invokeSpecial, toInject);
 				
@@ -114,7 +116,9 @@ public class ClassTransformer implements IClassTransformer
 				invokeSpecial.name = "doesFlowGetBlockedBy";
 				invokeSpecial.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
 				
-				method.instructions.insert(invokeSpecial, new InsnNode(POP));
+				//method.instructions.insert(invokeSpecial, new InsnNode(POP));
+				
+				ModEarliestOfGames.Log.info(" Patched 1 call of func_149807_p in " + method.name);
 			}
 		}
 	}

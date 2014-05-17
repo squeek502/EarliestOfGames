@@ -4,6 +4,7 @@ import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.content.CrateTile;
 
 public class Hooks
@@ -21,6 +22,11 @@ public class Hooks
 	
 	public static boolean doesFlowGetBlockedBy(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int fromSide)
 	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof CrateTile)
+		{
+			ModEarliestOfGames.Log.info("doesFlowGetBlockedBy: "+ForgeDirection.getOrientation(fromSide).toString());
+		}
 		return true;
 	}
 }
