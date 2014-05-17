@@ -88,15 +88,25 @@ public class CrateTile extends TileEntity implements IInventory
 	public List<ItemStack> getEscapableItemsInInventory()
 	{
 		List<ItemStack> escapableItems = new ArrayList<ItemStack>();
-		for (ItemStack item : inventoryItems)
+		for (ItemStack itemStack : inventoryItems)
 		{
-			if ()
+			if (canItemEscape(itemStack))
+				escapableItems.add(itemStack);
 		}
+		return escapableItems;
 	}
 
 	public boolean releaseEscapableItems()
 	{
+		boolean didItemEscape = false;
+		List<ItemStack> escapableItems = getEscapableItemsInInventory();
 
+		for (ItemStack itemStack : escapableItems)
+		{
+			didItemEscape = true;
+		}
+
+		return didItemEscape;
 	}
 
 	public boolean captureItemsInside()
