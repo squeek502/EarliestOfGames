@@ -2,6 +2,8 @@ package squeek.earliestofgames.content;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.material.Material;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.filters.SizeFilter;
 
@@ -53,6 +56,19 @@ public class CrateTile extends TileEntity implements IInventory
 		}
 	}
 
+	/*
+	 * Liquid flow
+	 */
+	public void handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
+	{
+		ModEarliestOfGames.Log.debug("onFlowIntoBlock: "+newFlowDecay);
+		
+		if (flowingBlock.getMaterial() == Material.water)
+		{
+			
+		}
+	}
+	
 	/*
 	 * Filters
 	 */
