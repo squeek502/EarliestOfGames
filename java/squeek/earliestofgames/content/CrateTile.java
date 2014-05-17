@@ -69,53 +69,16 @@ public class CrateTile extends TileEntity implements IInventory
 	/*
 	 * Liquid flow
 	 */
-	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
+	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay, ForgeDirection side)
 	{
 		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay);
 
-		ForgeDirection side = findSideOfFlowingLiquid(flowingBlock, newFlowDecay);
-		if (side == ForgeDirection.UNKNOWN || canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
+		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
 			return true;
 		}
 
 		return false;
-	}
-
-	public ForgeDirection findSideOfFlowingLiquid(BlockDynamicLiquid flowingBlock, int newFlowDecay)
-	{
-		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
-		{
-			Block blockOnSide = worldObj.getBlock(xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
-			
-			if (blockOnSide == null)
-				continue;
-			
-			if (side == ForgeDirection.UP && blockOnSide instanceof BlockStaticLiquid && flowingBlock.getMaterial() == blockOnSide.getMaterial() && newFlowDecay == 9)
-				return side;
-			
-			if (blockOnSide == flowingBlock)
-			{
-				try
-				{
-					// func_149804_e = getFlowDecay
-					Method getFlowDecay = BlockLiquid.class.getDeclaredMethod("func_149804_e", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-					getFlowDecay.setAccessible(true);
-					int flowDecay = (Integer) getFlowDecay.invoke(flowingBlock, worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
-					if (newFlowDecay - flowDecay <= 1)
-					{
-						return side;
-					}
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-					break;
-				}
-			}
-		}
-		
-		return ForgeDirection.UNKNOWN;
 	}
 
 	/*

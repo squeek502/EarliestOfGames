@@ -147,19 +147,21 @@ public class ClassTransformer implements IClassTransformer
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 			
-			// flowIntoBlock calls (many)
+/*			// flowIntoBlock calls (many)
 			// first two are down
+			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
 			for (int i=0; i<2; i++)
 			{
-				invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
 				while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
 				{
 					invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 				}
 				
+				toInject.clear();
+				toInject.add(new InsnNode(ICONST_0));
+				
 				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
 			}
-
 			for (int i=0; i<4; i++)
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
@@ -171,16 +173,12 @@ public class ClassTransformer implements IClassTransformer
 				toInject.clear();
 				
 				int flowDir = (i+2) % 4 + 2;
-				toInject.add(new VarInsnNode(ILOAD, lVar.index)); 	// l
-				toInject.add(new InsnNode(ICONST_2)); 				// 2
-				toInject.add(new InsnNode(IADD)); 					// l+2
-				toInject.add(new InsnNode(ICONST_4)); 				// 4
-				toInject.add(new InsnNode(IREM)); 					// (l+2) % 4
-				toInject.add(new InsnNode(ICONST_2)); 				// 2
-				toInject.add(new InsnNode(IADD)); 					// (l+2) % 4 + 2
+				int byteCode = flowDir == 2 ? ICONST_2 : (flowDir == 3 ? ICONST_3 : (flowDir == 4 ? ICONST_4 : ICONST_5));
+				toInject.add(new InsnNode(byteCode));
 				
 				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
 			}
+*/
 		}
 	}
 	

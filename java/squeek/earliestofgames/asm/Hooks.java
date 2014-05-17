@@ -12,14 +12,24 @@ import squeek.earliestofgames.content.CrateTile;
 public class Hooks
 {
 	// return true to cancel the default behavior
-	public static boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int newFlowDecay)
+	public static boolean onFlowIntoBlockFrom(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int newFlowDecay, int flowDirection)
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile != null && tile instanceof CrateTile)
 		{
-			return ((CrateTile) tile).handleFlowIntoBlock(flowingBlock, newFlowDecay);
+			if (((CrateTile) tile).handleFlowIntoBlock(flowingBlock, newFlowDecay, ForgeDirection.getOrientation(flowDirection).getOpposite()))
+				return true;
 		}
-		return false;
+		try
+		{
+			flowingBlock.getClass().getDeclaredMethod("func_149813_h", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE).invoke(flowingBlock, world, x, y, z, newFlowDecay);
+			return false;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return true;
+		}
 	}
 	
 	public static boolean doesFlowGetBlockedBy(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int flowDirection)
