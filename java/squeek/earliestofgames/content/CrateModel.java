@@ -64,49 +64,47 @@ public class CrateModel extends ModelBase
 				frame[pillarIndex++] = pillar;
 			}
 		}
+
+		AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(ForgeDirection.EAST);
+		
+		int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
+		int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
+		int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
+
+		sizeX /= 2;
+		sizeY -= sideWidth*2;
+		sizeZ -= sideWidth*2;
 		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
 			if (side == ForgeDirection.UP)
 				continue;
 
-			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
-			
 			double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
-			int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
-			int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
-			int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
 			
 			if (side.offsetX != 0)
 			{
 				originX += Math.abs(side.offsetX) * (float) sideWidth/4;
-				sizeX /= 2;
 				originZ += sideWidth;
 				originY += sideWidth;
-				sizeZ -= sideWidth*2;
-				sizeY -= sideWidth*2;
 			}
 			else if (side.offsetY != 0)
 			{
 				originY += Math.abs(side.offsetY) * (float) sideWidth/4;
-				sizeY /= 2;
 				originX += sideWidth;
 				originZ += sideWidth;
-				sizeX -= sideWidth*2;
-				sizeZ -= sideWidth*2;
 			}
 			else if (side.offsetZ != 0)
 			{
 				originZ += Math.abs(side.offsetZ) * (float) sideWidth/4;
-				sizeZ /= 2;
 				originX += sideWidth;
 				originY += sideWidth;
-				sizeX -= sideWidth*2;
-				sizeY -= sideWidth*2;
 			}
 
 			ModelRenderer sideModel = new ModelRenderer(this, 0, 0).setTextureSize(32, 32);
 			sideModel.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
+			if (side == ForgeDirection.DOWN)
+				sideModel.rotateAngleX = 1.570796f;
 			
 			sides[side.ordinal()] = sideModel;
 		}
@@ -122,10 +120,18 @@ public class CrateModel extends ModelBase
 	
 	public void renderSides()
 	{
-		for (ModelRenderer side : sides)
+		int i = 0;
+		for (ModelRenderer sidePart : sides)
 		{
-			if (side != null)
-				side.render(scale);
+			ForgeDirection side = ForgeDirection.getOrientation(i);
+			if (sidePart != null)
+			{
+				if (side == ForgeDirection.DOWN)
+					sidePart.rotateAngleZ = 1.570796f;
+				
+				sidePart.render(scale);
+			}
+			i++;
 		}
 		if (sideBox != null)
 			sideBox.render(scale);
