@@ -12,7 +12,7 @@ public class CrateModel extends ModelBase
 {
 	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length * 2];
 	private ModelRenderer[] sides = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length];
-	private ModelRenderer sideBox;
+	private ModelRenderer sideSizeFilter;
 	private float scale = 0.0625f;
 
 	public CrateModel()
@@ -123,6 +123,10 @@ public class CrateModel extends ModelBase
 		sides[ForgeDirection.EAST.ordinal()].setRotationPoint(15F, 2F, 8F);
 		sides[ForgeDirection.EAST.ordinal()].setTextureSize(64, 32);
 		sides[ForgeDirection.EAST.ordinal()].rotateAngleY = (float) Math.toRadians(270D);
+		
+		sideSizeFilter = new ModelRenderer(this, 8, 17);
+		sideSizeFilter.addBox(-6F, 0F, -0.5F, 12, 12, 1);
+		sideSizeFilter.setTextureSize(64, 32);
 	}
 
 	public void renderFrame()
@@ -144,15 +148,22 @@ public class CrateModel extends ModelBase
 			{
 				IFilter filter = tile.filters[side.ordinal()];
 				
-				sidePart.setTextureOffset(8, 4);
-				
 				if (filter != null)
 				{
 					if (filter instanceof SizeFilter)
-						sidePart.setTextureOffset(8, 17);
+					{
+						sideSizeFilter.setRotationPoint(sidePart.rotationPointX, sidePart.rotationPointY, sidePart.rotationPointZ);
+						sideSizeFilter.rotateAngleX = sidePart.rotateAngleX;
+						sideSizeFilter.rotateAngleY = sidePart.rotateAngleY;
+						sideSizeFilter.rotateAngleZ = sidePart.rotateAngleZ;
+						
+						sideSizeFilter.render(scale);
+					}
 				}
-				
-				sidePart.render(scale);
+				else
+				{
+					sidePart.render(scale);
+				}
 			}
 			i++;
 		}
