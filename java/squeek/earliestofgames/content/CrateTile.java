@@ -54,15 +54,18 @@ public class CrateTile extends TileEntity implements IInventory
 			captureItemEntitiesInside();
 	}
 
-	public void captureItemEntitiesInside()
+	public boolean captureItemEntitiesInside()
 	{
+		boolean didCapture = false;
 		List<EntityItem> itemEntities = getItemEntitiesInside();
 		
 		for (EntityItem itemEntity : itemEntities)
 		{
 			// insertStackFromEntity
-			TileEntityHopper.func_145898_a(this, itemEntity);
+			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
 		}
+		
+		return didCapture;
 	}
 
 	public List<EntityItem> getItemEntitiesInside()
