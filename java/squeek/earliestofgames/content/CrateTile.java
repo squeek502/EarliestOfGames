@@ -1,5 +1,6 @@
 package squeek.earliestofgames.content;
 
+import java.util.ArrayList;
 import java.util.List;
 import squeek.earliestofgames.filters.IFilter;
 import net.minecraft.command.IEntitySelector;
@@ -25,6 +26,19 @@ public class CrateTile extends TileEntity implements IInventory
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
+	}
+
+	public void setFilterOfSide(ForgeDirection side, IFilter filter)
+	{
+		if (side == ForgeDirection.UNKNOWN)
+			return;
+
+		filters[side.ordinal()] = filter;
+	}
+
+	public boolean canItemPassThroughSide(ItemStack item, ForgeDirection side)
+	{
+		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(item);
 	}
 
 	public boolean isCoolingDown()
@@ -55,10 +69,37 @@ public class CrateTile extends TileEntity implements IInventory
 		captureCooldown--;
 
 		if (!isCoolingDown() && couldCaptureItems())
-			captureItemEntitiesInside();
+			captureItemsInside();
 	}
 
-	public boolean captureItemEntitiesInside()
+	public boolean canItemEscape(ItemStack itemStack)
+	{
+		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+		{
+			if (side == ForgeDirection.UP)
+				continue;
+
+			if (canItemPassThroughSide(itemStack, side))
+				return true;
+		}
+		return false;
+	}
+
+	public List<ItemStack> getEscapableItemsInInventory()
+	{
+		List<ItemStack> escapableItems = new ArrayList<ItemStack>();
+		for (ItemStack item : inventoryItems)
+		{
+			if ()
+		}
+	}
+
+	public boolean releaseEscapableItems()
+	{
+
+	}
+
+	public boolean captureItemsInside()
 	{
 		boolean didCapture = false;
 		List<EntityItem> itemEntities = getItemEntitiesInside();

@@ -78,7 +78,7 @@ public class Crate extends BlockContainer
 			EntityItem itemEntity = (EntityItem) collidingEntity;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				if (((CrateTile)tile).canItemPassThroughSide(side))
+				if (((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
 					continue;
 
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
