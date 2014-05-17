@@ -30,48 +30,6 @@ public class ClassTransformer implements IClassTransformer
 		return bytes;
 	}
 	
-	private void addHandleFlowIntoBlockHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
-	{
-		AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
-		
-		InsnList toInject = new InsnList();
-
-		/*
-		// equivalent to:
-		if (Hooks.handleFlowIntoBlock(null, 0, 0, 0, 0))
-			return;
-		*/
-		toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
-		toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
-		toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
-		toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
-		toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
-		toInject.add(new VarInsnNode(ILOAD, 5)); 	// newFlowDecay
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
-		LabelNode label = new LabelNode();
-		toInject.add(new JumpInsnNode(IFEQ, label));
-		toInject.add(new InsnNode(RETURN));
-		toInject.add(label);
-		
-		method.instructions.insertBefore(targetNode, toInject);
-
-		ModEarliestOfGames.Log.info(" Set " + method.name + " access level to public");
-	}
-	
-	private boolean isMethodNodeOfBlockBlocksFlow(MethodInsnNode methodNode, boolean isObfuscated)
-	{
-		boolean isRightName = methodNode.name.equals(isObfuscated ? "p" : "func_149807_p");
-		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
-		return isRightName && isRightDesc;
-	}
-
-	private boolean isMethodNodeOfFlowIntoBlock(MethodInsnNode methodNode, boolean isObfuscated)
-	{
-		boolean isRightName = methodNode.name.equals(isObfuscated ? "h" : "func_149813_h");
-		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
-		return isRightName && isRightDesc;
-	}
-	
 	private void patchBlockDynamicLiquid(ClassNode classNode, boolean isObfuscated)
 	{
 		MethodNode method;
@@ -126,7 +84,7 @@ public class ClassTransformer implements IClassTransformer
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
 			
-			toInject = new InsnList();
+			toInject.clear();
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
@@ -166,7 +124,7 @@ public class ClassTransformer implements IClassTransformer
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
 			
-			toInject = new InsnList();
+			toInject.clear();
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
@@ -176,6 +134,7 @@ public class ClassTransformer implements IClassTransformer
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "a" : "updateTick", isObfuscated ? "(Lafn;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 		if (method != null)
 		{
+			// blockBlocksFlow call
 			MethodInsnNode invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
 			{
@@ -184,11 +143,59 @@ public class ClassTransformer implements IClassTransformer
 
 			InsnList toInject = new InsnList();
 			
-			toInject = new InsnList();
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
+			
+			// flowIntoBlock calls (many)
+			// first two are down
+			for (int i=0; i<2; i++)
+			{
+				invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+				while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
+				{
+					invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+				}
+				
+				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
+			}
+
+			for (int i=0; i<4; i++)
+			{
+				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+				while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
+				{
+					invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+				}
+				
+				toInject.clear();
+				
+				int flowDir = (i+2) % 4 + 2;
+				toInject.add(new VarInsnNode(ILOAD, lVar.index)); 	// l
+				toInject.add(new InsnNode(ICONST_2)); 				// 2
+				toInject.add(new InsnNode(IADD)); 					// l+2
+				toInject.add(new InsnNode(ICONST_4)); 				// 4
+				toInject.add(new InsnNode(IREM)); 					// (l+2) % 4
+				toInject.add(new InsnNode(ICONST_2)); 				// 2
+				toInject.add(new InsnNode(IADD)); 					// (l+2) % 4 + 2
+				
+				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
+			}
 		}
+	}
+	
+	private boolean isMethodNodeOfBlockBlocksFlow(MethodInsnNode methodNode, boolean isObfuscated)
+	{
+		boolean isRightName = methodNode.name.equals(isObfuscated ? "p" : "func_149807_p");
+		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		return isRightName && isRightDesc;
+	}
+
+	private boolean isMethodNodeOfFlowIntoBlock(MethodInsnNode methodNode, boolean isObfuscated)
+	{
+		boolean isRightName = methodNode.name.equals(isObfuscated ? "h" : "func_149813_h");
+		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;IIII)V" : "(Lnet/minecraft/world/World;IIII)V");
+		return isRightName && isRightDesc;
 	}
 	
 	private void patchBlockBlocksFlowCall(MethodNode method, MethodInsnNode invokeInstruction, InsnList additionalInstructions)
@@ -207,7 +214,7 @@ public class ClassTransformer implements IClassTransformer
 		}
 	}
 	
-	private void patchFlowIntoBlocksCall(MethodNode method, MethodInsnNode invokeInstruction, InsnList additionalInstructions)
+	private void patchFlowIntoBlockCall(MethodNode method, MethodInsnNode invokeInstruction, InsnList additionalInstructions)
 	{
 		if (invokeInstruction != null)
 		{
