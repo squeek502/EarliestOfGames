@@ -176,9 +176,21 @@ public class Crate extends BlockContainer
 	}
 	
 	@Override
+	public boolean isOpaqueCube()
+	{
+		return false;
+	}
+	
+	@Override
 	public int getRenderType()
 	{
 		return -1;
+	}
+	
+	@Override
+	public int getRenderBlockPass()
+	{
+		return 1;
 	}
 	
 	@Override

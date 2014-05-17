@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class CrateModel extends ModelBase
 {
-	private ModelRenderer frame = new ModelRenderer(this, 0, 0);
+	private ModelRenderer frame = new ModelRenderer(this, 0, 0).setTextureSize(16, 16);
 	private float scale = 0.0625f;
 	
 	public CrateModel()
@@ -22,10 +22,6 @@ public class CrateModel extends ModelBase
 			if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
 				continue;
 			
-			// temp
-			if (side == ForgeDirection.NORTH || side == ForgeDirection.SOUTH)
-				continue;
-			
 			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
 			int numPillars = side.offsetX != 0 ? 4 : 2;
 			
@@ -34,7 +30,7 @@ public class CrateModel extends ModelBase
 				double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
 				int sizeX = (int) ((sideBounds.maxX-sideBounds.minX) / scale);
 				int sizeY = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
-				int sizeZ = (int) ((sideBounds.maxY-sideBounds.minY) / scale);
+				int sizeZ = (int) ((sideBounds.maxZ-sideBounds.minZ) / scale);
 				
 				if (side.offsetX != 0)
 				{
@@ -48,15 +44,16 @@ public class CrateModel extends ModelBase
 						originZ += sideWidth;
 						sizeZ -= sideWidth*2;
 						originY = originY + (pillarNum-2) * (sideLength - sideWidth);
-						int oldSizeY = sizeY;
 						sizeY = sizeX;
-						//sizeX = oldSizeY;
 					}
 				}
-				if (side.offsetY != 0)
-					originX = originX + pillarNum * (sideLength - sideWidth);
 				if (side.offsetZ != 0)
+				{
+					originX += sideWidth;
+					sizeX -= sideWidth*2;
 					originY = originY + pillarNum * (sideLength - sideWidth);
+					sizeY = sizeZ;
+				}
 				
 				frame.addBox((float) originX, (float) originY, (float) originZ, sizeX, sizeY, sizeZ);
 			}
