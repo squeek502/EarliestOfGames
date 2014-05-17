@@ -134,34 +134,34 @@ public class ClassTransformer implements IClassTransformer
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "a" : "updateTick", isObfuscated ? "(Lafn;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 		if (method != null)
 		{
-			// blockBlocksFlow call
+			InsnList toInject = new InsnList();
+			
+			// flowIntoBlock calls
 			MethodInsnNode invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+			while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
+			{
+				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
+			}
+			
+			toInject.clear();
+			toInject.add(new InsnNode(ICONST_0));
+			
+			//patchFlowIntoBlockCall(method, invokeSpecial, toInject);
+			
+			// blockBlocksFlow call
+			invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
 
-			InsnList toInject = new InsnList();
-			
+			toInject.clear();
 			toInject.add(new InsnNode(ICONST_0));
 
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
-			
-/*			// flowIntoBlock calls (many)
-			// first two are down
-			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
-			for (int i=0; i<2; i++)
-			{
-				while (invokeSpecial != null && !(isMethodNodeOfFlowIntoBlock(invokeSpecial, isObfuscated)))
-				{
-					invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
-				}
-				
-				toInject.clear();
-				toInject.add(new InsnNode(ICONST_0));
-				
-				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
-			}
+
+			/*
+			// more flowIntoBlock calls
 			for (int i=0; i<4; i++)
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
@@ -178,7 +178,7 @@ public class ClassTransformer implements IClassTransformer
 				
 				patchFlowIntoBlockCall(method, invokeSpecial, toInject);
 			}
-*/
+			*/
 		}
 	}
 	
