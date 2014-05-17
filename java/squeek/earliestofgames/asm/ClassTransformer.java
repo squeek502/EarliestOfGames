@@ -109,21 +109,25 @@ public class ClassTransformer implements IClassTransformer
 			
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 			
-			do
+			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
+			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)));
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
-			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)));
 			
-			patchBlockBlocksFlowCall(method, invokeSpecial, new InsnNode(ICONST_0));
+			toInject = new InsnList();
+			toInject.add(new InsnNode(ICONST_0));
+
+			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 		}
 	}
 	
-	private void patchBlockBlocksFlowCall(MethodNode method, MethodInsnNode invokeInstruction, AbstractInsnNode additionalInstructions)
+	private void patchBlockBlocksFlowCall(MethodNode method, MethodInsnNode invokeInstruction, InsnList additionalInstructions)
 	{
 		if (invokeInstruction != null)
 		{
-			method.instructions.insertBefore(invokeInstruction, additionalInstructions);
+			if (additionalInstructions.size() > 0)
+				method.instructions.insertBefore(invokeInstruction, additionalInstructions);
 			
 			invokeInstruction.setOpcode(INVOKESTATIC);
 			invokeInstruction.owner = Hooks.class.getName().replace('.', '/');
