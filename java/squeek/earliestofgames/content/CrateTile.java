@@ -94,7 +94,10 @@ public class CrateTile extends TileEntity implements IInventory
 		captureCooldown--;
 
 		if (!isCoolingDown() && couldCaptureItems())
-			captureItemsInside();
+		{
+			//captureItemsInside();
+			captureCooldown = captureCheckInterval;
+		}
 	}
 
 	public boolean canItemEscape(ItemStack itemStack)

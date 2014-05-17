@@ -78,7 +78,7 @@ public class Crate extends BlockContainer
 			EntityItem itemEntity = (EntityItem) collidingEntity;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				if (((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
+				if (side == ForgeDirection.UP || ((CrateTile)tile).canItemPassThroughSide(itemEntity.getEntityItem(), side))
 					continue;
 
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
@@ -123,7 +123,7 @@ public class Crate extends BlockContainer
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
 	{
-		return getInnerBoundingBox(world, x, y, z);
+		return AxisAlignedBB.getAABBPool().getAABB(0D, 0D, 0D, 0D, 0D, 0D);
 	}
 
 	public AxisAlignedBB getInnerBoundingBox(World world, int x, int y, int z)
