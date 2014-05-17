@@ -24,6 +24,9 @@ public class CrateTile extends TileEntity implements IInventory
 
 	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
 
+	/*
+	 * Constructors
+	 */
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
@@ -33,6 +36,26 @@ public class CrateTile extends TileEntity implements IInventory
 		setFilterOfSide(ForgeDirection.DOWN, down);
 	}
 
+	/*
+	 * Update
+	 */
+	@Override
+	public void updateEntity()
+	{
+		super.updateEntity();
+
+		captureCooldown--;
+
+		if (shouldCaptureItems() && couldCaptureItems())
+		{
+			captureItemsInside();
+			captureCooldown = captureTickInterval;
+		}
+	}
+
+	/*
+	 * Filters
+	 */
 	public void setFilterOfSide(ForgeDirection side, IFilter filter)
 	{
 		if (side == ForgeDirection.UNKNOWN)
@@ -44,7 +67,7 @@ public class CrateTile extends TileEntity implements IInventory
 			onFilterChanged(side);
 		}
 	}
-	
+
 	protected void onFilterChanged(ForgeDirection side)
 	{
 		if (side != ForgeDirection.UP)
@@ -56,29 +79,24 @@ public class CrateTile extends TileEntity implements IInventory
 		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(item);
 	}
 
-	public boolean isCoolingDown()
+	/*
+	 * Capturing
+	 */
+	public boolean captureItemsInside()
 	{
-		return captureCooldown > 0;
-	}
+		boolean didCapture = false;
+		List<EntityItem> itemEntities = getItemEntitiesInside();
 
-	public boolean isInventoryEmpty()
-	{
-		for (ItemStack itemStack : inventoryItems)
+		for (EntityItem itemEntity : itemEntities)
 		{
-			if (itemStack != null)
-				return false;
+			if (canItemEscape(itemEntity.getEntityItem()))
+				continue;
+
+			// func_145898_a = insertStackFromEntity
+			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
 		}
-		return true;
-	}
-	
-	public boolean isInventoryFull()
-	{
-		for (ItemStack itemStack : inventoryItems)
-		{
-			if (itemStack == null)
-				return false;
-		}
-		return true;
+
+		return didCapture;
 	}
 
 	public boolean couldCaptureItems()
@@ -86,18 +104,30 @@ public class CrateTile extends TileEntity implements IInventory
 		return !isInventoryFull();
 	}
 
-	@Override
-	public void updateEntity()
+	public boolean shouldCaptureItems()
 	{
-		super.updateEntity();
+		return captureCooldown <= 0;
+	}
 
-		captureCooldown--;
+	public List<EntityItem> getItemEntitiesInside()
+	{
+		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
+	}
 
-		if (!isCoolingDown() && couldCaptureItems())
+	/*
+	 * Releasing
+	 */
+	public boolean releaseEscapableItems()
+	{
+		boolean didItemEscape = false;
+		List<Integer> escapableSlots = getInventorySlotsWithEscapableItems();
+
+		for (int slotNum : escapableSlots)
 		{
-			captureItemsInside();
-			captureCooldown = captureTickInterval;
+			didItemEscape = didItemEscape || releaseItemFromSlot(slotNum);
 		}
+
+		return didItemEscape;
 	}
 
 	public boolean canItemEscape(ItemStack itemStack)
@@ -125,65 +155,56 @@ public class CrateTile extends TileEntity implements IInventory
 		return escapableSlots;
 	}
 
-	public boolean releaseEscapableItems()
-	{
-		boolean didItemEscape = false;
-		List<Integer> escapableSlots = getInventorySlotsWithEscapableItems();
-
-		for (int slotNum : escapableSlots)
-		{
-			didItemEscape = didItemEscape || releaseItemFromSlot(slotNum);
-		}
-
-		return didItemEscape;
-	}
-
-	public boolean captureItemsInside()
-	{
-		boolean didCapture = false;
-		List<EntityItem> itemEntities = getItemEntitiesInside();
-
-		for (EntityItem itemEntity : itemEntities)
-		{
-			if (canItemEscape(itemEntity.getEntityItem()))
-				continue;
-			
-			// func_145898_a = insertStackFromEntity
-			didCapture = didCapture || TileEntityHopper.func_145898_a(this, itemEntity);
-		}
-
-		return didCapture;
-	}
-
-	public List<EntityItem> getItemEntitiesInside()
-	{
-		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
-	}
-	
 	public boolean releaseItemFromSlot(int slotNum)
 	{
 		ItemStack itemStack = getStackInSlot(slotNum);
 		if (itemStack != null)
 		{
-	        EntityItem entityItem = new EntityItem(worldObj, xCoord+0.5f, yCoord+0.5f, zCoord+0.5f, getStackInSlot(slotNum));
-	        worldObj.spawnEntityInWorld(entityItem);
-	        setInventorySlotContents(slotNum, null);
-	        return true;
+			EntityItem entityItem = new EntityItem(worldObj, xCoord + 0.5f, yCoord + 0.5f, zCoord + 0.5f, getStackInSlot(slotNum));
+			worldObj.spawnEntityInWorld(entityItem);
+			setInventorySlotContents(slotNum, null);
+			return true;
 		}
 		return false;
 	}
-	
+
+	/*
+	 * Inventory utility
+	 */
 	protected void onSlotFilled(int slotNum)
 	{
 		if (canItemEscape(getStackInSlot(slotNum)))
 			releaseItemFromSlot(slotNum);
 	}
-	
+
 	protected void onSlotEmptied(int slotNum)
 	{
-		
+
 	}
 
+	public boolean isInventoryEmpty()
+	{
+		for (ItemStack itemStack : inventoryItems)
+		{
+			if (itemStack != null)
+				return false;
+		}
+		return true;
+	}
+
+	public boolean isInventoryFull()
+	{
+		for (ItemStack itemStack : inventoryItems)
+		{
+			if (itemStack == null || itemStack.stackSize != itemStack.getMaxStackSize())
+				return false;
+		}
+		return true;
+	}
+
+	/*
+	 * IInventory implementation
+	 */
 	@Override
 	public int getSizeInventory()
 	{
@@ -228,13 +249,13 @@ public class CrateTile extends TileEntity implements IInventory
 	{
 		if (slotNum >= getSizeInventory() || slotNum < 0)
 			return;
-		
+
 		boolean wasEmpty = inventoryItems[slotNum] == null;
 		inventoryItems[slotNum] = itemStack;
 
 		if (itemStack != null && itemStack.stackSize > getInventoryStackLimit())
 			itemStack.stackSize = getInventoryStackLimit();
-		
+
 		if (wasEmpty && itemStack != null)
 			onSlotFilled(slotNum);
 		else if (!wasEmpty && itemStack == null)
@@ -285,6 +306,9 @@ public class CrateTile extends TileEntity implements IInventory
 		return true;
 	}
 
+	/*
+	 * Save data
+	 */
 	@Override
 	public void writeToNBT(NBTTagCompound compound)
 	{
