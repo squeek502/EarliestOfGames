@@ -90,36 +90,47 @@ public class ClassTransformer implements IClassTransformer
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
-			if (invokeSpecial != null)
+
+			InsnList toInject = new InsnList();
+			
+			LocalVariableNode lVar = findLocalVariable(method, "l", "I");
+
+			/*
+			// equivalent to:
+			Hooks.doesFlowGetBlockedBy(null, null, 0, 0, 0, (l+2) % 4 + 2);
+			*/
+			toInject.add(new VarInsnNode(ILOAD, lVar.index)); 	// l
+			toInject.add(new InsnNode(ICONST_2)); 				// 2
+			toInject.add(new InsnNode(IADD)); 					// l+2
+			toInject.add(new InsnNode(ICONST_4)); 				// 4
+			toInject.add(new InsnNode(IREM)); 					// (l+2) % 4
+			toInject.add(new InsnNode(ICONST_2)); 				// 2
+			toInject.add(new InsnNode(IADD)); 					// (l+2) % 4 + 2
+			
+			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
+			
+			do
 			{
-				/*
-				// equivalent to:
-				Hooks.doesFlowGetBlockedBy(null, null, 0, 0, 0, (l+2) % 4 + 2);
-				*/
-				
-				InsnList toInject = new InsnList();
-				
-				LocalVariableNode lVar = findLocalVariable(method, "l", "I");
-			    
-				toInject.add(new VarInsnNode(ILOAD, lVar.index)); 	// l
-				toInject.add(new InsnNode(ICONST_2)); 				// 2
-				toInject.add(new InsnNode(IADD)); 					// l+2
-				toInject.add(new InsnNode(ICONST_4)); 				// 4
-				toInject.add(new InsnNode(IREM)); 					// (l+2) % 4
-				toInject.add(new InsnNode(ICONST_2)); 				// 2
-				toInject.add(new InsnNode(IADD)); 					// (l+2) % 4 + 2
-				
-				method.instructions.insertBefore(invokeSpecial, toInject);
-				
-				invokeSpecial.setOpcode(INVOKESTATIC);
-				invokeSpecial.owner = Hooks.class.getName().replace('.', '/');
-				invokeSpecial.name = "doesFlowGetBlockedBy";
-				invokeSpecial.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
-				
-				//method.instructions.insert(invokeSpecial, new InsnNode(POP));
-				
-				ModEarliestOfGames.Log.info(" Patched 1 call of func_149807_p in " + method.name);
+				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
+			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)));
+			
+			patchBlockBlocksFlowCall(method, invokeSpecial, new InsnNode(ICONST_0));
+		}
+	}
+	
+	private void patchBlockBlocksFlowCall(MethodNode method, MethodInsnNode invokeInstruction, AbstractInsnNode additionalInstructions)
+	{
+		if (invokeInstruction != null)
+		{
+			method.instructions.insertBefore(invokeInstruction, additionalInstructions);
+			
+			invokeInstruction.setOpcode(INVOKESTATIC);
+			invokeInstruction.owner = Hooks.class.getName().replace('.', '/');
+			invokeInstruction.name = "doesFlowGetBlockedBy";
+			invokeInstruction.desc = "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z";
+			
+			ModEarliestOfGames.Log.info(" Patched call of blockBlocksFlow in " + method.name);
 		}
 	}
 
@@ -164,13 +175,16 @@ public class ClassTransformer implements IClassTransformer
 
 	private AbstractInsnNode findNextInstructionOfType(AbstractInsnNode startInstruction, int bytecode)
 	{
-		AbstractInsnNode instruction = startInstruction.getNext();
-		while (instruction != null)
+		if (startInstruction != null)
 		{
-			if (instruction.getOpcode() == bytecode)
-				return instruction;
-			
-			instruction = startInstruction.getNext();
+			AbstractInsnNode instruction = startInstruction.getNext();
+			while (instruction != null)
+			{
+				if (instruction.getOpcode() == bytecode)
+					return instruction;
+				
+				instruction = startInstruction.getNext();
+			}
 		}
 		return null;
 	}

@@ -20,12 +20,12 @@ public class Hooks
 		return false;
 	}
 	
-	public static boolean doesFlowGetBlockedBy(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int fromSide)
+	public static boolean doesFlowGetBlockedBy(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z, int flowDirection)
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile != null && tile instanceof CrateTile)
 		{
-			ModEarliestOfGames.Log.info("doesFlowGetBlockedBy: "+ForgeDirection.getOrientation(fromSide).toString());
+			ModEarliestOfGames.Log.info("doesFlowGetBlockedBy: "+ForgeDirection.getOrientation(flowDirection).toString());
 		}
 		return true;
 	}
