@@ -9,6 +9,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModEarliestOfGames;
@@ -18,7 +19,7 @@ import squeek.earliestofgames.helpers.GuiHelper;
 
 public class Crate extends BlockContainer
 {
-	public static double sideWidth = 0.0125D;
+	public static double sideWidth = 0.125D;
 	
 	protected String blockName;
 
@@ -173,5 +174,17 @@ public class Crate extends BlockContainer
 	public int getRenderType()
 	{
 		return CrateRenderer.modelId;
+	}
+	
+	@Override
+	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean getUseNeighborBrightness()
+	{
+		return false;
 	}
 }
