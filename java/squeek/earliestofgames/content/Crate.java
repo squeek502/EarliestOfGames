@@ -184,7 +184,7 @@ public class Crate extends BlockContainer
 	@Override
 	public int getRenderType()
 	{
-		return 22;
+		return -1;
 	}
 	
 	@Override
