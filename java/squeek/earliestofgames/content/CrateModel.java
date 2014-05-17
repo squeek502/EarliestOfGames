@@ -11,6 +11,7 @@ public class CrateModel extends ModelBase
 {
 	private ModelRenderer[] frame = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length*2];
 	private ModelRenderer[] sides = new ModelRenderer[ForgeDirection.VALID_DIRECTIONS.length];
+	private ModelRenderer sideBox;
 	private float scale = 0.0625f;
 	
 	public CrateModel()
@@ -64,6 +65,11 @@ public class CrateModel extends ModelBase
 			}
 		}
 		
+		sideBox = new ModelRenderer(this, 1, 1).setTextureSize(14, 14);
+		sideBox.addBox(1, 1, 1, 14, 14, 14);
+		sideBox.mirror = true;
+		
+		/*
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
 			if (side == ForgeDirection.UP)
@@ -109,6 +115,7 @@ public class CrateModel extends ModelBase
 			
 			sides[side.ordinal()] = sideModel;
 		}
+		*/
 	}
 	
 	public void renderFrame()
@@ -126,6 +133,9 @@ public class CrateModel extends ModelBase
 			if (side != null)
 				side.render(scale);
 		}
+		sideBox.setTextureOffset(-2, -2);
+		sideBox.setTextureSize(16, 16);
+		sideBox.render(scale);
 	}
 	
 	@Override
