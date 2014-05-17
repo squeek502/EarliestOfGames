@@ -25,8 +25,11 @@ public class ClassTransformer implements IClassTransformer
 			if (methodNode != null)
 			{
 				addHandleFlowIntoBlockHook(methodNode, Hooks.class, "handleFlowIntoBlock", "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;IIII)Z");
-				return writeClassToBytes(classNode);
 			}
+			
+			patchBlockBlocksFlowCalls(classNode, isObfuscated);
+			
+			return writeClassToBytes(classNode);
 		}
 		
 		return bytes;
@@ -59,6 +62,20 @@ public class ClassTransformer implements IClassTransformer
 
 		ModEarliestOfGames.Log.info(" Patched " + method.name);
 	}
+	
+	private void patchBlockBlocksFlowCalls(ClassNode classNode, boolean isObfuscated)
+	{
+		// blockBlocksFlow = func_149807_p
+		
+		MethodNode method;
+		
+		//method = findMethodNodeOfClass(classNode, isObfuscated ? "p" : "func_149807_p", isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "o" : "func_149808_o", isObfuscated ? "(Lafn;III)[Z" : "(Lnet/minecraft/world/World;III)[Z");
+		if (method != null)
+		{
+			findFirstInstructionOfType(method, INVOKESPECIAL);
+		}
+	}
 
 	private ClassNode readClassFromBytes(byte[] bytes)
 	{
@@ -85,6 +102,7 @@ public class ClassTransformer implements IClassTransformer
 				return method;
 			}
 		}
+		ModEarliestOfGames.Log.error(" Target method not found: " + methodName);
 		return null;
 	}
 
@@ -94,6 +112,19 @@ public class ClassTransformer implements IClassTransformer
 		{
 			if (instruction.getOpcode() == bytecode)
 				return instruction;
+		}
+		return null;
+	}
+
+	private AbstractInsnNode findNextInstructionOfType(AbstractInsnNode startInstruction, int bytecode)
+	{
+		AbstractInsnNode instruction = startInstruction.getNext();
+		while (instruction != null)
+		{
+			if (instruction.getOpcode() == bytecode)
+				return instruction;
+			
+			instruction = startInstruction.getNext();
 		}
 		return null;
 	}
