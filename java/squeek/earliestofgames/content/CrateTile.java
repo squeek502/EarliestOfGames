@@ -59,7 +59,7 @@ public class CrateTile extends TileEntity implements IInventory
 	/*
 	 * Liquid flow
 	 */
-	public void handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
+	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
 	{
 		ModEarliestOfGames.Log.debug("onFlowIntoBlock: "+newFlowDecay);
 		
@@ -67,6 +67,8 @@ public class CrateTile extends TileEntity implements IInventory
 		{
 			
 		}
+		
+		return false;
 	}
 	
 	/*
@@ -93,6 +95,11 @@ public class CrateTile extends TileEntity implements IInventory
 	public boolean canItemPassThroughSide(ItemStack item, ForgeDirection side)
 	{
 		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(item);
+	}
+	
+	public boolean canLiquidPassThroughSide(BlockLiquid flowingBlock, ForgeDirection side)
+	{
+		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(flowingBlock);
 	}
 
 	/*
