@@ -65,7 +65,9 @@ public class ClassTransformer implements IClassTransformer
 	
 	private boolean isMethodNodeOfBlockBlocksFlow(MethodInsnNode methodNode, boolean isObfuscated)
 	{
-		return methodNode.name.equals(isObfuscated ? "p" : "func_149807_p") && methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		boolean isRightName = methodNode.name.equals(isObfuscated ? "p" : "func_149807_p");
+		boolean isRightDesc = methodNode.desc.equals(isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		return isRightName && isRightDesc;
 	}
 	
 	private void patchBlockBlocksFlowCalls(ClassNode classNode, boolean isObfuscated)
@@ -110,7 +112,7 @@ public class ClassTransformer implements IClassTransformer
 			patchBlockBlocksFlowCall(method, invokeSpecial, toInject);
 			
 			invokeSpecial = (MethodInsnNode) findFirstInstructionOfType(method, INVOKESPECIAL);
-			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)));
+			while (invokeSpecial != null && !(isMethodNodeOfBlockBlocksFlow(invokeSpecial, isObfuscated)))
 			{
 				invokeSpecial = (MethodInsnNode) findNextInstructionOfType(invokeSpecial, INVOKESPECIAL);
 			}
@@ -187,7 +189,7 @@ public class ClassTransformer implements IClassTransformer
 				if (instruction.getOpcode() == bytecode)
 					return instruction;
 				
-				instruction = startInstruction.getNext();
+				instruction = instruction.getNext();
 			}
 		}
 		return null;
