@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.item.EntityItem;
@@ -64,7 +65,7 @@ public class CrateTile extends TileEntity implements IInventory
 	 */
 	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay)
 	{
-		ModEarliestOfGames.Log.debug("onFlowIntoBlock: " + newFlowDecay);
+		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay);
 
 		ForgeDirection side = findSideOfFlowingLiquid(flowingBlock, newFlowDecay);
 		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
@@ -81,12 +82,18 @@ public class CrateTile extends TileEntity implements IInventory
 		{
 			Block blockOnSide = worldObj.getBlock(xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
 			
-			if (blockOnSide != null && blockOnSide == flowingBlock)
+			if (blockOnSide == null)
+				continue;
+			
+			if (side == ForgeDirection.UP && blockOnSide instanceof BlockStaticLiquid && flowingBlock.getMaterial() == blockOnSide.getMaterial() && newFlowDecay == 9)
+				return side;
+			
+			if (blockOnSide == flowingBlock)
 			{
 				try
 				{
 					// func_149804_e = getFlowDecay
-					Method getFlowDecay = BlockLiquid.class.getDeclaredMethod("func_149804_e", World.class, int.class, int.class, int.class);
+					Method getFlowDecay = BlockLiquid.class.getDeclaredMethod("func_149804_e", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
 					getFlowDecay.setAccessible(true);
 					int flowDecay = (Integer) getFlowDecay.invoke(flowingBlock, worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ);
 					if (newFlowDecay - flowDecay <= 1)
