@@ -28,7 +28,7 @@ public class Crate extends BlockContainer
 		// doesn't block water flowing through it
         public boolean blocksMovement()
         {
-            return false;
+            return true;
         }
     });
 
