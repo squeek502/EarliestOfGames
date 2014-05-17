@@ -144,6 +144,26 @@ public class CrateModel extends ModelBase
 					sidePart.offsetX = 1f;
 					sidePart.offsetZ = 1f;
 				}
+
+				if (side == ForgeDirection.NORTH)
+				{
+					sidePart.rotateAngleX = 0;
+					sidePart.rotateAngleY = 1.570796f;
+					sidePart.rotateAngleZ = 0f;
+					sidePart.offsetY = 0f;
+					sidePart.offsetX = 0.125f - 0.125f/4;
+					sidePart.offsetZ = 1f + 0.125f - 0.125f/4;
+				}
+
+				if (side == ForgeDirection.SOUTH)
+				{
+					sidePart.rotateAngleX = 0;
+					sidePart.rotateAngleY = -1.570796f;
+					sidePart.rotateAngleZ = 0f;
+					sidePart.offsetY = 0f;
+					sidePart.offsetX = 1f - 0.125f + 0.125f/4;
+					sidePart.offsetZ = -0.125f + 0.125f/4;
+				}
 				
 				sidePart.render(scale);
 			}
