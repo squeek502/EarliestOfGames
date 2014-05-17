@@ -1,9 +1,11 @@
 package squeek.earliestofgames.content;
 
+import java.util.List;
+import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -16,6 +18,24 @@ public class CrateTile extends TileEntity implements IInventory
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
+	}
+
+	@Override
+	public void updateEntity()
+	{
+		super.updateEntity();
+
+		captureItemEntitiesInside();
+	}
+
+	public void captureItemEntitiesInside()
+	{
+		List<EntityItem> itemEntities = getItemEntitiesInside();
+	}
+
+	public List<EntityItem> getItemEntitiesInside()
+	{
+		return worldObj.selectEntitiesWithinAABB(EntityItem.class, getBlockType().getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
 	}
 
 	@Override
@@ -64,7 +84,7 @@ public class CrateTile extends TileEntity implements IInventory
 
 		if (itemStack != null && itemStack.stackSize > getInventoryStackLimit())
 			itemStack.stackSize = getInventoryStackLimit();
-		
+
 		markDirty();
 	}
 
@@ -89,7 +109,7 @@ public class CrateTile extends TileEntity implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double) this.xCoord + 0.5D, (double) this.yCoord + 0.5D, (double) this.zCoord + 0.5D) <= 64.0D;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import squeek.earliestofgames.helpers.GuiHelper;
 public class Crate extends BlockContainer
 {
 	public String blockName;
+	public static double sideWidth = 0.0125D;
 
 	public Crate()
 	{
@@ -71,10 +72,9 @@ public class Crate extends BlockContainer
 	{
 		if (true || collidingEntity instanceof EntityItem)
 		{
-			double sideWidth = 0.001D;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				if (side == ForgeDirection.UP)
+				if (side == ForgeDirection.UP || side == ForgeDirection.DOWN)
 					continue;
 
 				double minX = this.minX, minY = this.minY, minZ = this.minZ;
@@ -115,10 +115,17 @@ public class Crate extends BlockContainer
 	}
 
 	// hack to get World.isBlockFullCube to return false so that items won't always get pushed out
+	// just need to return a bounding box with an average side length < 1
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
 	{
-		return AxisAlignedBB.getAABBPool().getAABB(0D, 0D, 0D, 0D, 0D, 0D);
+		return getInnerBoundingBox(world, x, y, z);
+	}
+
+	public AxisAlignedBB getInnerBoundingBox(World world, int x, int y, int z)
+	{
+		return AxisAlignedBB.getAABBPool().getAABB(x + minX + sideWidth, y + minY + sideWidth, z + minZ + sideWidth,
+													x + maxX - sideWidth, y + maxY - sideWidth, z + maxZ - sideWidth);
 	}
 
 	@Override
