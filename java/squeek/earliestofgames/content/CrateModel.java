@@ -16,29 +16,76 @@ public class CrateModel extends ModelBase
 	
 	public CrateModel()
 	{
-
+		// four corner pillars
 		frame[0] = new ModelRenderer(this, 0, 0);
 		frame[0].addBox(0F, 0F, 0F, 2, 16, 2);
-		frame[0].setRotationPoint(16F, 0F, 0F);
+		frame[0].setRotationPoint(0F, 0F, 0F);
 		frame[0].setTextureSize(64, 32);
-		frame[0].rotateAngleY = (float) Math.toRadians(270D);
 
 		frame[1] = new ModelRenderer(this, 0, 0);
 		frame[1].addBox(0F, 0F, 0F, 2, 16, 2);
-		frame[1].setRotationPoint(0F, 0F, 0F);
+		frame[1].setRotationPoint(0F, 0F, 16F);
 		frame[1].setTextureSize(64, 32);
+		frame[1].rotateAngleY = (float) Math.toRadians(90D);
 
 		frame[2] = new ModelRenderer(this, 0, 0);
 		frame[2].addBox(0F, 0F, 0F, 2, 16, 2);
-		frame[2].setRotationPoint(0F, 0F, 16F);
+		frame[2].setRotationPoint(16F, 0F, 16F);
 		frame[2].setTextureSize(64, 32);
-		frame[2].rotateAngleY = (float) Math.toRadians(90D);
+		frame[2].rotateAngleY = (float) Math.toRadians(180D);
 
 		frame[3] = new ModelRenderer(this, 0, 0);
 		frame[3].addBox(0F, 0F, 0F, 2, 16, 2);
-		frame[3].setRotationPoint(16F, 0F, 16F);
+		frame[3].setRotationPoint(16F, 0F, 0F);
 		frame[3].setTextureSize(64, 32);
-		frame[3].rotateAngleY = (float) Math.toRadians(180D);
+		frame[3].rotateAngleY = (float) Math.toRadians(270D);
+		
+		// support beams
+		frame[4] = new ModelRenderer(this, 2, 0);
+		frame[4].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[4].setRotationPoint(2F, 14F, 0F);
+		frame[4].setTextureSize(64, 32);
+		
+		frame[5] = new ModelRenderer(this, 2, 0);
+		frame[5].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[5].setRotationPoint(2F, 0F, 0F);
+		frame[5].setTextureSize(64, 32);
+		
+		frame[6] = new ModelRenderer(this, 2, 0);
+		frame[6].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[6].setRotationPoint(0F, 0F, 14F);
+		frame[6].setTextureSize(64, 32);
+		frame[6].rotateAngleY = (float) Math.toRadians(90D);
+		
+		frame[7] = new ModelRenderer(this, 2, 0);
+		frame[7].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[7].setRotationPoint(0F, 14F, 14F);
+		frame[7].setTextureSize(64, 32);
+		frame[7].rotateAngleY = (float) Math.toRadians(90D);
+		
+		frame[8] = new ModelRenderer(this, 2, 0);
+		frame[8].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[8].setRotationPoint(14F, 0F, 16F);
+		frame[8].setTextureSize(64, 32);
+		frame[8].rotateAngleY = (float) Math.toRadians(180D);
+		
+		frame[9] = new ModelRenderer(this, 2, 0);
+		frame[9].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[9].setRotationPoint(14F, 14F, 16F);
+		frame[9].setTextureSize(64, 32);
+		frame[9].rotateAngleY = (float) Math.toRadians(180D);
+		
+		frame[10] = new ModelRenderer(this, 2, 0);
+		frame[10].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[10].setRotationPoint(16F, 14F, 2F);
+		frame[10].setTextureSize(64, 32);
+		frame[10].rotateAngleY = (float) Math.toRadians(270D);
+		
+		frame[11] = new ModelRenderer(this, 2, 0);
+		frame[11].addBox(0F, 0F, 0F, 12, 2, 2);
+		frame[11].setRotationPoint(16F, 0F, 2F);
+		frame[11].setTextureSize(64, 32);
+		frame[11].rotateAngleY = (float) Math.toRadians(270D);
 		
 		/*
 		int sideWidth = (int) (ModContent.blockCrate.sideWidth / scale);
