@@ -4,6 +4,7 @@ import squeek.earliestofgames.ModContent;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class CrateModel extends ModelBase
@@ -18,11 +19,23 @@ public class CrateModel extends ModelBase
 		
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
-			ModContent.blockCrate.getSideBoundingBox(side);
+			AxisAlignedBB sideBounds = ModContent.blockCrate.getSideBoundingBox(side);
 			
 			for (int pillarNum = 0; pillarNum < 2; pillarNum++)
 			{
-				frame.addBox(0f, 0f, 16f * pillarNum, sideWidth, sideLength, sideWidth);
+				double originX = sideBounds.minX / scale, originY = sideBounds.minY / scale, originZ = sideBounds.minZ / scale;
+				
+				if (side.offsetX != 0)
+					originZ = originZ + pillarNum * (sideLength - sideWidth);
+				if (side.offsetY != 0)
+					originX = originX + pillarNum * (sideLength - sideWidth);
+				if (side.offsetZ != 0)
+					originY = originY + pillarNum * (sideLength - sideWidth);
+				
+				frame.addBox((float) originX, (float) originY, (float) originZ, 
+				             (int) ((sideBounds.maxX-sideBounds.minX) / scale), 
+				             (int) ((sideBounds.maxY-sideBounds.minY) / scale), 
+				             (int) ((sideBounds.maxY-sideBounds.minY) / scale));
 			}
 		}
 	}
