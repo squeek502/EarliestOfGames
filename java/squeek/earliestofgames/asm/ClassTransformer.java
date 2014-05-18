@@ -296,7 +296,35 @@ public class ClassTransformer implements IClassTransformer
 				
 				method.instructions.insert(invokeSpecial, new InsnNode(POP));
 			}
+		}
+
+		// liquidCanDisplaceBlock
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "q" : "func_149809_q", isObfuscated ? "(Lafn;III)Z" : "(Lnet/minecraft/world/World;III)Z");
+		if (method != null)
+		{
+			AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
 			
+			InsnList toInject = new InsnList();
+			/*
+			// equivalent to:
+			if (Hooks.canLiquidDisplaceBlock(this, null, 0, 0, 0))
+				return true;
+			*/
+			toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
+			toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
+			toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
+			toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
+			toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
+			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "canLiquidDisplaceBlock", "(Lnet/minecraft/block/BlockDynamicLiquid;Lnet/minecraft/world/World;III)Z"));
+			LabelNode label = new LabelNode();
+			toInject.add(new JumpInsnNode(IFEQ, label));
+			toInject.add(new InsnNode(ICONST_1));
+			toInject.add(new InsnNode(IRETURN));
+			toInject.add(label);
+			
+			method.instructions.insertBefore(targetNode, toInject);
+
+			ModEarliestOfGames.Log.info(" Patched " + method.name);
 		}
 	}
 	

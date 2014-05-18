@@ -75,4 +75,15 @@ public class Hooks
 		}
 		return -1;
 	}
+	
+	public static boolean canLiquidDisplaceBlock(BlockDynamicLiquid flowingBlock, World world, int x, int y, int z)
+	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof CrateTile)
+		{
+			ModEarliestOfGames.Log.info("canLiquidDisplaceBlock from " + flowingBlock.getMaterial().toString());
+			return true;
+		}
+		return false;
+	}
 }
