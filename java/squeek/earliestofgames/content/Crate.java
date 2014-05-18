@@ -34,7 +34,7 @@ public class Crate extends BlockContainer
 
 	public Crate()
 	{
-		super(crateMaterial);
+		super(Material.water);
 		setBlockName(ModInfo.MODID + "." + this.getClass().getSimpleName());
 		setBlockTextureName(ModInfo.MODID + ":" + this.getClass().getSimpleName());
 	}
