@@ -1,14 +1,20 @@
 package squeek.earliestofgames.asm;
 
 import static org.objectweb.asm.Opcodes.*;
-import java.io.IOException;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.*;
-import cpw.mods.fml.common.asm.transformers.AccessTransformer;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import squeek.earliestofgames.ModEarliestOfGames;
-import squeek.earliestofgames.ModInfo;
 
 public class ClassTransformer implements IClassTransformer
 {
@@ -39,7 +45,7 @@ public class ClassTransformer implements IClassTransformer
 		return bytes;
 	}
 	
-	private void patchBlockLiquid(ClassNode classNode, boolean isObfuscated)
+	private int patchBlockLiquid(ClassNode classNode, boolean isObfuscated)
 	{
 		ModEarliestOfGames.Log.info("Patching BlockLiquid...");
 		
@@ -54,8 +60,12 @@ public class ClassTransformer implements IClassTransformer
 
 			
 			// equivalent to:
-			if (Hooks.getFlowDecay(null, null, 0, 0, 0))
-				return;
+			int flowDecay = Hooks.getFlowDecay(null, null, 0, 0, 0);
+			if (flowDecay >= 0)
+				return flowDecay;
+
+			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", null, null, null, method.localVariables.size());
+			method.localVariables.add(null);
 			
 			toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
 			toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
@@ -63,6 +73,7 @@ public class ClassTransformer implements IClassTransformer
 			toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
 			toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
 			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/World;III)I"));
+			toInject.add(new VarInsnNode(ISTORE, localVar.index));
 			LabelNode label = new LabelNode();
 			toInject.add(new JumpInsnNode(IFEQ, label));
 			toInject.add(new InsnNode(RETURN));
@@ -72,6 +83,7 @@ public class ClassTransformer implements IClassTransformer
 
 			ModEarliestOfGames.Log.info(" Patched " + method.name);
 		}
+		return 0;
 	}
 	
 	private void patchBlockDynamicLiquid(ClassNode classNode, boolean isObfuscated)
