@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.filters.SizeFilter;
+import squeek.earliestofgames.helpers.WorldHelper;
 
 public class CrateTile extends TileEntity implements IInventory
 {
@@ -175,8 +176,13 @@ public class CrateTile extends TileEntity implements IInventory
 				continue;
 			
 			boolean canMoveTowardsSide = side == ForgeDirection.DOWN || liquidFlow.isFlowingTowardsSide(side);
+			if (!canMoveTowardsSide)
+				continue;
+			
+			if (WorldHelper.getBlockOnSide(this, side).isBlockSolid(worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ, side.ordinal()))
+				continue;
 
-			if (canMoveTowardsSide && canItemPassThroughSide(itemStack, side))
+			if (canItemPassThroughSide(itemStack, side))
 				return true;
 		}
 		return false;

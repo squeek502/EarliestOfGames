@@ -46,7 +46,7 @@ public class LiquidFlow
 		{
 			if (liquidFlows[flowDirection.ordinal()] != null)
 			{
-				flowVector.addVector(flowDirection.offsetX, flowDirection.offsetY, flowDirection.offsetZ);
+				flowVector = flowVector.addVector(flowDirection.offsetX, flowDirection.offsetY, flowDirection.offsetZ);
 			}
 		}
 		
