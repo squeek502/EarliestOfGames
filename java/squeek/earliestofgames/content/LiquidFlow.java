@@ -2,6 +2,7 @@ package squeek.earliestofgames.content;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -11,6 +12,12 @@ public class LiquidFlow
 {
 	public LiquidFlowInfo[] liquidFlows = new LiquidFlowInfo[ForgeDirection.VALID_DIRECTIONS.length];
 	protected Vec3 flowVector = Vec3.createVectorHelper(0D, 0D, 0D);
+	protected CrateTile crate = null;
+	
+	public LiquidFlow(CrateTile parentTile)
+	{
+		this.crate = parentTile;
+	}
 	
 	public class LiquidFlowInfo
 	{
@@ -53,6 +60,11 @@ public class LiquidFlow
 		return flowVector;
 	}
 	
+	public boolean isFlowing()
+	{
+		return flowVector.xCoord != 0 || flowVector.yCoord != 0 || flowVector.zCoord != 0;
+	}
+	
 	public void addFlowVelocityToEntity(Entity entity, Vec3 velocity)
 	{
         Vec3 vec_flow = this.getFlowVector();
@@ -66,5 +78,14 @@ public class LiquidFlow
 		return (side.offsetX != 0 && side.offsetX * getFlowVector().xCoord > 0)
 				|| (side.offsetY != 0 && side.offsetY * getFlowVector().yCoord > 0)
 				|| (side.offsetZ != 0 && side.offsetZ * getFlowVector().zCoord > 0);
+	}
+	
+	public void update()
+	{
+		if (isFlowing())
+		{
+			AxisAlignedBB AABB = ((Crate) (this.crate.getBlockType())).getOuterBoundingBox(crate.getWorldObj(), crate.xCoord, crate.yCoord, crate.zCoord);
+			
+		}
 	}
 }

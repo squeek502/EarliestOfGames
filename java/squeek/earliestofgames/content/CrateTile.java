@@ -30,7 +30,7 @@ public class CrateTile extends TileEntity implements IInventory
 	protected int captureTickInterval = 8;
 
 	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
-	protected LiquidFlow liquidFlow = new LiquidFlow();
+	protected LiquidFlow liquidFlow = new LiquidFlow(this);
 
 	/*
 	 * Constructors
@@ -65,6 +65,8 @@ public class CrateTile extends TileEntity implements IInventory
 			captureItemsInside();
 			captureCooldown = captureTickInterval;
 		}
+		
+		liquidFlow.update();
 	}
 
 	/*
@@ -142,6 +144,11 @@ public class CrateTile extends TileEntity implements IInventory
 	public List<EntityItem> getItemEntitiesInside()
 	{
 		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
+	}
+
+	public List<EntityItem> getItemEntitiesInsideOuterBounds()
+	{
+		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getOuterBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
 	}
 
 	/*
