@@ -2,7 +2,7 @@ package squeek.earliestofgames.content;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -31,11 +31,9 @@ public class LiquidFlow
 	
 	public void onLiquidFlowFrom(Block block, int flowDecay, ForgeDirection flowDirection)
 	{
+		// TODO: Water has no fluid for BlockDynamicFluid?
 		Fluid fluid = FluidRegistry.lookupFluidForBlock(block);
-		if (fluid != null)
-		{
-			liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid);
-		}
+		liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid);
 		
 		recalculateFlowVector();
 	}
@@ -84,8 +82,14 @@ public class LiquidFlow
 	{
 		if (isFlowing())
 		{
-			AxisAlignedBB AABB = ((Crate) (this.crate.getBlockType())).getOuterBoundingBox(crate.getWorldObj(), crate.xCoord, crate.yCoord, crate.zCoord);
-			
+			for (EntityItem itemEntity : crate.getItemEntitiesInsideOuterBounds())
+			{
+	            Vec3 velocity = crate.getWorldObj().getWorldVec3Pool().getVecFromPool(0.0D, 0.0D, 0.0D);
+				addFlowVelocityToEntity(itemEntity, velocity);
+				itemEntity.motionX += velocity.xCoord;
+				itemEntity.motionY += velocity.yCoord;
+				itemEntity.motionZ += velocity.zCoord;
+			}
 		}
 	}
 }
