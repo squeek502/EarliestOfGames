@@ -18,7 +18,16 @@ public class ClassTransformer implements IClassTransformer
 		if (name.equals("net.minecraft.block.BlockDynamicLiquid") || name.equals("ajd"))
 		{
 			boolean isObfuscated = name.equals("ajd");
-			ModEarliestOfGames.Log.info("Patching BlockDynamicLiquid...");
+
+			ClassNode classNode = readClassFromBytes(bytes);
+			
+			patchBlockDynamicLiquid(classNode, isObfuscated);
+			
+			return writeClassToBytes(classNode);
+		}
+		else if (name.equals("net.minecraft.block.BlockLiquid") || name.equals("aki"))
+		{
+			boolean isObfuscated = name.equals("aki");
 
 			ClassNode classNode = readClassFromBytes(bytes);
 			
@@ -30,8 +39,45 @@ public class ClassTransformer implements IClassTransformer
 		return bytes;
 	}
 	
+	private void patchBlockLiquid(ClassNode classNode, boolean isObfuscated)
+	{
+		ModEarliestOfGames.Log.info("Patching BlockLiquid...");
+		
+		MethodNode method;
+		
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "e" : "func_149804_e", isObfuscated ? "(Lafn;III)I" : "(Lnet/minecraft/world/World;III)I");
+		if (method != null)
+		{
+			AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
+			
+			InsnList toInject = new InsnList();
+
+			
+			// equivalent to:
+			if (Hooks.getFlowDecay(null, null, 0, 0, 0))
+				return;
+			
+			toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
+			toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
+			toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
+			toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
+			toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
+			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/World;III)I"));
+			LabelNode label = new LabelNode();
+			toInject.add(new JumpInsnNode(IFEQ, label));
+			toInject.add(new InsnNode(RETURN));
+			toInject.add(label);
+			
+			method.instructions.insertBefore(targetNode, toInject);
+
+			ModEarliestOfGames.Log.info(" Patched " + method.name);
+		}
+	}
+	
 	private void patchBlockDynamicLiquid(ClassNode classNode, boolean isObfuscated)
 	{
+		ModEarliestOfGames.Log.info("Patching BlockDynamicLiquid...");
+		
 		MethodNode method;
 		
 		// flowIntoBlock

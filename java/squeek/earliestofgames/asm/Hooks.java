@@ -1,7 +1,7 @@
 package squeek.earliestofgames.asm;
 
-import java.lang.reflect.InvocationTargetException;
 import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -49,5 +49,10 @@ public class Hooks
 			e.printStackTrace();
 			return true;
 		}
+	}
+	
+	public static int getFlowDecay(BlockLiquid liquidBlock, World world, int x, int y, int z)
+	{
+		return -1;
 	}
 }
