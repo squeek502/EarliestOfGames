@@ -30,6 +30,7 @@ public class CrateTile extends TileEntity implements IInventory
 	protected int captureTickInterval = 8;
 
 	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
+	protected LiquidFlow liquidFlow = new LiquidFlow();
 
 	/*
 	 * Constructors
@@ -75,6 +76,7 @@ public class CrateTile extends TileEntity implements IInventory
 
 		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
 		{
+			liquidFlow.onLiquidFlowFrom(flowingBlock, newFlowDecay, side.getOpposite());
 			return true;
 		}
 
@@ -164,8 +166,10 @@ public class CrateTile extends TileEntity implements IInventory
 		{
 			if (side == ForgeDirection.UP)
 				continue;
+			
+			boolean canMoveTowardsSide = side == ForgeDirection.DOWN || liquidFlow.isFlowingTowardsSide(side);
 
-			if (canItemPassThroughSide(itemStack, side))
+			if (canMoveTowardsSide && canItemPassThroughSide(itemStack, side))
 				return true;
 		}
 		return false;
