@@ -97,7 +97,7 @@ public class CrateTile extends TileEntity implements IInventory
 	
 	public int getEffectiveFlowDecay(BlockLiquid liquidBlock)
 	{
-		return getFlowDecay(liquidBlock) >= 0 ? 0 : -1;
+		return 0;
 	}
 
 	/*
