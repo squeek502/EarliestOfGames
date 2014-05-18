@@ -4,6 +4,7 @@ import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import squeek.earliestofgames.ModEarliestOfGames;
@@ -17,8 +18,8 @@ public class Hooks
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile != null && tile instanceof CrateTile)
 		{
-			if (((CrateTile) tile).handleFlowIntoBlock(flowingBlock, newFlowDecay, ForgeDirection.getOrientation(flowDirection).getOpposite()))
-				return true;
+			((CrateTile) tile).handleFlowIntoBlock(flowingBlock, newFlowDecay, ForgeDirection.getOrientation(flowDirection).getOpposite());
+			return true;
 		}
 		try
 		{
@@ -58,6 +59,18 @@ public class Hooks
 		{
 			int flowDecay = ((CrateTile) tile).getFlowDecay(liquidBlock);
 			ModEarliestOfGames.Log.info("getFlowDecay: " + flowDecay + " (from " + liquidBlock.getMaterial().toString() + ")");
+			return flowDecay;
+		}
+		return -1;
+	}
+	
+	public static int getEffectiveFlowDecay(BlockLiquid liquidBlock, IBlockAccess world, int x, int y, int z)
+	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof CrateTile)
+		{
+			int flowDecay = ((CrateTile) tile).getEffectiveFlowDecay(liquidBlock);
+			ModEarliestOfGames.Log.info("getEffectiveFlowDecay: " + flowDecay + " (from " + liquidBlock.getMaterial().toString() + ")");
 			return flowDecay;
 		}
 		return -1;

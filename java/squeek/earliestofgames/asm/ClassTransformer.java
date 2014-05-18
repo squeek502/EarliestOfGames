@@ -68,12 +68,12 @@ public class ClassTransformer implements IClassTransformer
 				return flowDecay;
 			*/
 			
-			ModEarliestOfGames.Log.info("  maxlocals before: " + method.maxLocals);
+			ModEarliestOfGames.Log.debug("  maxlocals before: " + method.maxLocals);
 			LabelNode varStartLabel = new LabelNode();
 			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, varStartLabel, end, method.maxLocals);
 			method.maxLocals += Type.INT_TYPE.getSize();
 			method.localVariables.add(localVar);
-			ModEarliestOfGames.Log.info("  maxlocals after: " + method.maxLocals);
+			ModEarliestOfGames.Log.debug("  maxlocals after: " + method.maxLocals);
 			
 			toInject.add(new VarInsnNode(ALOAD, 0)); 					// this
 			toInject.add(new VarInsnNode(ALOAD, 1)); 					// world
@@ -81,6 +81,49 @@ public class ClassTransformer implements IClassTransformer
 			toInject.add(new VarInsnNode(ILOAD, 3)); 					// y
 			toInject.add(new VarInsnNode(ILOAD, 4)); 					// z
 			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/World;III)I"));
+			toInject.add(new VarInsnNode(ISTORE, localVar.index));		// flowDecay = return val
+			toInject.add(varStartLabel);								// variable scope start
+			LabelNode label = new LabelNode();							// label if condition is true
+			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// check against flowDecay
+			toInject.add(new JumpInsnNode(IFLT, label));				// flowDecay >= 0
+			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// get ready to return flowDecay
+			toInject.add(new InsnNode(IRETURN));						// return flowDecay
+			toInject.add(label);										// if condition was true, jump here
+			
+			method.instructions.insertBefore(targetNode, toInject);
+
+			ModEarliestOfGames.Log.info(" Patched " + method.name);
+		}
+
+		method = findMethodNodeOfClass(classNode, isObfuscated ? "e" : "getEffectiveFlowDecay", isObfuscated ? "(Lafx;III)I" : "(Lnet/minecraft/world/IBlockAccess;III)I");
+		if (method != null)
+		{
+			//LabelNode start = findStartLabel(method);
+			LabelNode end = findEndLabel(method);
+			AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
+			
+			InsnList toInject = new InsnList();
+
+			/*
+			// equivalent to:
+			int flowDecay = Hooks.getFlowDecay(null, null, 0, 0, 0);
+			if (flowDecay >= 0)
+				return flowDecay;
+			*/
+			
+			ModEarliestOfGames.Log.debug("  maxlocals before: " + method.maxLocals);
+			LabelNode varStartLabel = new LabelNode();
+			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, varStartLabel, end, method.maxLocals);
+			method.maxLocals += Type.INT_TYPE.getSize();
+			method.localVariables.add(localVar);
+			ModEarliestOfGames.Log.debug("  maxlocals after: " + method.maxLocals);
+			
+			toInject.add(new VarInsnNode(ALOAD, 0)); 					// this
+			toInject.add(new VarInsnNode(ALOAD, 1)); 					// world
+			toInject.add(new VarInsnNode(ILOAD, 2)); 					// x
+			toInject.add(new VarInsnNode(ILOAD, 3)); 					// y
+			toInject.add(new VarInsnNode(ILOAD, 4)); 					// z
+			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getEffectiveFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/IBlockAccess;III)I"));
 			toInject.add(new VarInsnNode(ISTORE, localVar.index));		// flowDecay = return val
 			toInject.add(varStartLabel);								// variable scope start
 			LabelNode label = new LabelNode();							// label if condition is true

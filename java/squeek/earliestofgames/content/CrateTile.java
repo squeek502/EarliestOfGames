@@ -49,6 +49,10 @@ public class CrateTile extends TileEntity implements IInventory
 		SizeFilter north = new SizeFilter();
 		north.maxItemSize = 4f;
 		setFilterOfSide(ForgeDirection.NORTH, north);
+		
+		SizeFilter south = new SizeFilter();
+		north.maxItemSize = 4f;
+		setFilterOfSide(ForgeDirection.SOUTH, south);
 	}
 
 	/*
@@ -89,6 +93,11 @@ public class CrateTile extends TileEntity implements IInventory
 	public int getFlowDecay(BlockLiquid liquidBlock)
 	{
 		return liquidFlow.getFlowDecay();
+	}
+	
+	public int getEffectiveFlowDecay(BlockLiquid liquidBlock)
+	{
+		return getFlowDecay(liquidBlock) >= 0 ? 0 : -1;
 	}
 
 	/*
