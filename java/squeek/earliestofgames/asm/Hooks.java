@@ -56,8 +56,9 @@ public class Hooks
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile != null && tile instanceof CrateTile)
 		{
-			ModEarliestOfGames.Log.info("getFlowDecay: " + liquidBlock.getMaterial().toString());
-			return ((CrateTile) tile).getFlowDecay(liquidBlock);
+			int flowDecay = ((CrateTile) tile).getFlowDecay(liquidBlock);
+			ModEarliestOfGames.Log.info("getFlowDecay: " + flowDecay + " (from " + liquidBlock.getMaterial().toString() + ")");
+			return flowDecay;
 		}
 		return -1;
 	}

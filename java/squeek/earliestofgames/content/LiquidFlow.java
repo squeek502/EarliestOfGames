@@ -39,7 +39,7 @@ public class LiquidFlow
 		Fluid fluid = FluidRegistry.lookupFluidForBlock(block);
 		liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid, flowDecay);
 		
-		Hooks.onFlowIntoBlockFrom((BlockDynamicLiquid) block, crate.getWorldObj(), crate.xCoord+flowDirection.offsetX, crate.yCoord+flowDirection.offsetY, crate.zCoord+flowDirection.offsetZ, 0, flowDirection.ordinal());
+		Hooks.onFlowIntoBlockFrom((BlockDynamicLiquid) block, crate.getWorldObj(), crate.xCoord+flowDirection.offsetX, crate.yCoord+flowDirection.offsetY, crate.zCoord+flowDirection.offsetZ, 9, flowDirection.ordinal());
 		
 		recalculateFlowVector();
 	}

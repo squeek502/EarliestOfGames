@@ -55,7 +55,7 @@ public class ClassTransformer implements IClassTransformer
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "e" : "func_149804_e", isObfuscated ? "(Lafn;III)I" : "(Lnet/minecraft/world/World;III)I");
 		if (method != null)
 		{
-			LabelNode start = findStartLabel(method);
+			//LabelNode start = findStartLabel(method);
 			LabelNode end = findEndLabel(method);
 			AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
 			
@@ -69,7 +69,8 @@ public class ClassTransformer implements IClassTransformer
 			*/
 			
 			ModEarliestOfGames.Log.info("  maxlocals before: " + method.maxLocals);
-			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, start, end, method.maxLocals);
+			LabelNode varStartLabel = new LabelNode();
+			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, varStartLabel, end, method.maxLocals);
 			method.maxLocals += Type.INT_TYPE.getSize();
 			method.localVariables.add(localVar);
 			ModEarliestOfGames.Log.info("  maxlocals after: " + method.maxLocals);
@@ -81,11 +82,12 @@ public class ClassTransformer implements IClassTransformer
 			toInject.add(new VarInsnNode(ILOAD, 4)); 					// z
 			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/World;III)I"));
 			toInject.add(new VarInsnNode(ISTORE, localVar.index));		// flowDecay = return val
+			toInject.add(varStartLabel);								// variable scope start
 			LabelNode label = new LabelNode();							// label if condition is true
 			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// check against flowDecay
 			toInject.add(new JumpInsnNode(IFLT, label));				// flowDecay >= 0
 			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// get ready to return flowDecay
-			toInject.add(new InsnNode(RETURN));							// return flowDecay
+			toInject.add(new InsnNode(IRETURN));						// return flowDecay
 			toInject.add(label);										// if condition was true, jump here
 			
 			method.instructions.insertBefore(targetNode, toInject);
