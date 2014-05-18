@@ -85,6 +85,11 @@ public class CrateTile extends TileEntity implements IInventory
 
 		return false;
 	}
+	
+	public int getFlowDecay(BlockLiquid liquidBlock)
+	{
+		return liquidFlow.getFlowDecay();
+	}
 
 	/*
 	 * Filters

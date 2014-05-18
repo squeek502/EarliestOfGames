@@ -37,7 +37,7 @@ public class ClassTransformer implements IClassTransformer
 
 			ClassNode classNode = readClassFromBytes(bytes);
 			
-			patchBlockDynamicLiquid(classNode, isObfuscated);
+			patchBlockLiquid(classNode, isObfuscated);
 			
 			return writeClassToBytes(classNode);
 		}
@@ -45,7 +45,7 @@ public class ClassTransformer implements IClassTransformer
 		return bytes;
 	}
 	
-	private int patchBlockLiquid(ClassNode classNode, boolean isObfuscated)
+	private void patchBlockLiquid(ClassNode classNode, boolean isObfuscated)
 	{
 		ModEarliestOfGames.Log.info("Patching BlockLiquid...");
 		
@@ -54,36 +54,39 @@ public class ClassTransformer implements IClassTransformer
 		method = findMethodNodeOfClass(classNode, isObfuscated ? "e" : "func_149804_e", isObfuscated ? "(Lafn;III)I" : "(Lnet/minecraft/world/World;III)I");
 		if (method != null)
 		{
+			LabelNode start = findStartLabel(method);
+			LabelNode end = findEndLabel(method);
 			AbstractInsnNode targetNode = findFirstInstructionOfType(method, ALOAD);
 			
 			InsnList toInject = new InsnList();
 
-			
+			/*
 			// equivalent to:
 			int flowDecay = Hooks.getFlowDecay(null, null, 0, 0, 0);
 			if (flowDecay >= 0)
 				return flowDecay;
-
-			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", null, null, null, method.localVariables.size());
+			*/
+			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, start, end, method.localVariables.size());
 			method.localVariables.add(null);
 			
-			toInject.add(new VarInsnNode(ALOAD, 0)); 	// this
-			toInject.add(new VarInsnNode(ALOAD, 1)); 	// world
-			toInject.add(new VarInsnNode(ILOAD, 2)); 	// x
-			toInject.add(new VarInsnNode(ILOAD, 3)); 	// y
-			toInject.add(new VarInsnNode(ILOAD, 4)); 	// z
+			toInject.add(new VarInsnNode(ALOAD, 0)); 					// this
+			toInject.add(new VarInsnNode(ALOAD, 1)); 					// world
+			toInject.add(new VarInsnNode(ILOAD, 2)); 					// x
+			toInject.add(new VarInsnNode(ILOAD, 3)); 					// y
+			toInject.add(new VarInsnNode(ILOAD, 4)); 					// z
 			toInject.add(new MethodInsnNode(INVOKESTATIC, Hooks.class.getName().replace('.', '/'), "getFlowDecay", "(Lnet/minecraft/block/BlockLiquid;Lnet/minecraft/world/World;III)I"));
-			toInject.add(new VarInsnNode(ISTORE, localVar.index));
-			LabelNode label = new LabelNode();
-			toInject.add(new JumpInsnNode(IFEQ, label));
-			toInject.add(new InsnNode(RETURN));
-			toInject.add(label);
+			toInject.add(new VarInsnNode(ISTORE, localVar.index));		// flowDecay = return val
+			LabelNode label = new LabelNode();							// label if condition is true
+			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// check against flowDecay
+			toInject.add(new JumpInsnNode(IFLT, label));				// flowDecay >= 0
+			toInject.add(new VarInsnNode(ILOAD, localVar.index));		// get ready to return flowDecay
+			toInject.add(new InsnNode(RETURN));							// return flowDecay
+			toInject.add(label);										// if condition was true, jump here
 			
 			method.instructions.insertBefore(targetNode, toInject);
 
 			ModEarliestOfGames.Log.info(" Patched " + method.name);
 		}
-		return 0;
 	}
 	
 	private void patchBlockDynamicLiquid(ClassNode classNode, boolean isObfuscated)

@@ -24,10 +24,12 @@ public class LiquidFlow
 	public class LiquidFlowInfo
 	{
 		public Fluid fluid;
+		public int flowDecay;
 		
-		public LiquidFlowInfo(Fluid fluid)
+		public LiquidFlowInfo(Fluid fluid, int flowDecay)
 		{
 			this.fluid = fluid;
+			this.flowDecay = flowDecay;
 		}
 	}
 	
@@ -35,7 +37,7 @@ public class LiquidFlow
 	{
 		// TODO: Water has no fluid for BlockDynamicFluid?
 		Fluid fluid = FluidRegistry.lookupFluidForBlock(block);
-		liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid);
+		liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid, flowDecay);
 		
 		Hooks.onFlowIntoBlockFrom((BlockDynamicLiquid) block, crate.getWorldObj(), crate.xCoord+flowDirection.offsetX, crate.yCoord+flowDirection.offsetY, crate.zCoord+flowDirection.offsetZ, 0, flowDirection.ordinal());
 		
@@ -60,6 +62,17 @@ public class LiquidFlow
 	public Vec3 getFlowVector()
 	{
 		return flowVector;
+	}
+	
+	public int getFlowDecay()
+	{
+		int lowestFlowDecay = 1000;
+		for (LiquidFlowInfo flow : liquidFlows)
+		{
+			if (flow != null && flow.flowDecay < lowestFlowDecay)
+				lowestFlowDecay = flow.flowDecay;
+		}
+		return lowestFlowDecay != 1000 ? lowestFlowDecay : -1;
 	}
 	
 	public boolean isFlowing()

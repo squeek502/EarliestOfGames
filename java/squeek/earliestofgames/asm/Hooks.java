@@ -53,6 +53,12 @@ public class Hooks
 	
 	public static int getFlowDecay(BlockLiquid liquidBlock, World world, int x, int y, int z)
 	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof CrateTile)
+		{
+			ModEarliestOfGames.Log.info("getFlowDecay: " + liquidBlock.getMaterial().toString());
+			return ((CrateTile) tile).getFlowDecay(liquidBlock);
+		}
 		return -1;
 	}
 }
