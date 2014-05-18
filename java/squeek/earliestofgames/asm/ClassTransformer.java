@@ -14,6 +14,7 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import com.sun.xml.internal.ws.org.objectweb.asm.Type;
 import squeek.earliestofgames.ModEarliestOfGames;
 
 public class ClassTransformer implements IClassTransformer
@@ -66,8 +67,12 @@ public class ClassTransformer implements IClassTransformer
 			if (flowDecay >= 0)
 				return flowDecay;
 			*/
-			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, start, end, method.localVariables.size());
-			method.localVariables.add(null);
+			
+			ModEarliestOfGames.Log.info("  maxlocals before: " + method.maxLocals);
+			LocalVariableNode localVar = new LocalVariableNode("flowDecay", "I", method.signature, start, end, method.maxLocals);
+			method.maxLocals += Type.INT_TYPE.getSize();
+			method.localVariables.add(localVar);
+			ModEarliestOfGames.Log.info("  maxlocals after: " + method.maxLocals);
 			
 			toInject.add(new VarInsnNode(ALOAD, 0)); 					// this
 			toInject.add(new VarInsnNode(ALOAD, 1)); 					// world
@@ -359,5 +364,26 @@ public class ClassTransformer implements IClassTransformer
 				return localVar;
 		}
 		return null;
+	}
+	
+	private LabelNode findStartLabel(MethodNode method)
+	{
+		for (AbstractInsnNode instruction : method.instructions.toArray())
+		{
+			if (instruction instanceof LabelNode)
+				return (LabelNode) instruction;
+		}
+		return null;
+	}
+
+	private LabelNode findEndLabel(MethodNode method)
+	{
+		LabelNode lastLabel = null;
+		for (AbstractInsnNode instruction : method.instructions.toArray())
+		{
+			if (instruction instanceof LabelNode)
+				lastLabel = (LabelNode) instruction;
+		}
+		return lastLabel;
 	}
 }
