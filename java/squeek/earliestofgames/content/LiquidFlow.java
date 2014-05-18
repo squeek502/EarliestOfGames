@@ -1,6 +1,8 @@
 package squeek.earliestofgames.content;
 
+import squeek.earliestofgames.asm.Hooks;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.util.Vec3;
@@ -34,6 +36,8 @@ public class LiquidFlow
 		// TODO: Water has no fluid for BlockDynamicFluid?
 		Fluid fluid = FluidRegistry.lookupFluidForBlock(block);
 		liquidFlows[flowDirection.ordinal()] = new LiquidFlowInfo(fluid);
+		
+		Hooks.onFlowIntoBlockFrom((BlockDynamicLiquid) block, crate.getWorldObj(), crate.xCoord+flowDirection.offsetX, crate.yCoord+flowDirection.offsetY, crate.zCoord+flowDirection.offsetZ, 0, flowDirection.ordinal());
 		
 		recalculateFlowVector();
 	}
