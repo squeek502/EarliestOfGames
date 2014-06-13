@@ -8,30 +8,40 @@ import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import squeek.earliestofgames.ModEarliestOfGames;
+import squeek.earliestofgames.base.TileEntityFluidJunction;
+import squeek.earliestofgames.filters.EmptyFilter;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.filters.SizeFilter;
 import squeek.earliestofgames.helpers.WorldHelper;
 
-public class CrateTile extends TileEntity implements IInventory
+public class CrateTile extends TileEntityFluidJunction implements IInventory
 {
 	protected ItemStack[] inventoryItems;
 	protected int captureCooldown = 0;
 	protected int captureTickInterval = 8;
 
 	protected IFilter[] filters = new IFilter[ForgeDirection.VALID_DIRECTIONS.length];
-	protected LiquidFlow liquidFlow = new LiquidFlow(this);
+
+	protected int ticksUntilNextBubble = 0;
+	protected int ticksPerBubble = 2;
 
 	/*
 	 * Constructors
@@ -39,9 +49,9 @@ public class CrateTile extends TileEntity implements IInventory
 	public CrateTile()
 	{
 		inventoryItems = new ItemStack[14];
-		
+
 		setFilterOfSide(ForgeDirection.UP, new SizeFilter());
-		
+
 		SizeFilter down = new SizeFilter();
 		down.maxItemSize = 0.5f;
 		setFilterOfSide(ForgeDirection.DOWN, down);
@@ -49,7 +59,7 @@ public class CrateTile extends TileEntity implements IInventory
 		SizeFilter north = new SizeFilter();
 		north.maxItemSize = 4f;
 		setFilterOfSide(ForgeDirection.NORTH, north);
-		
+
 		SizeFilter south = new SizeFilter();
 		north.maxItemSize = 4f;
 		setFilterOfSide(ForgeDirection.SOUTH, south);
@@ -70,45 +80,74 @@ public class CrateTile extends TileEntity implements IInventory
 			captureItemsInside();
 			captureCooldown = captureTickInterval;
 		}
-		
-		liquidFlow.update();
+
+		if (getInputFlow(ForgeDirection.UP) != null && getInputFlow(ForgeDirection.UP).getFluid() == FluidRegistry.WATER)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				ForgeDirection side = ForgeDirection.getOrientation(i % 4 + 2);
+				double x = (double) (xCoord + 0.5f + side.offsetX / 1.75f);
+				double y = (double) (yCoord + 1.3f);
+				double z = (double) (zCoord + 0.5f + side.offsetZ / 1.75f);
+				double velX = (double) (worldObj.rand.nextFloat() * side.offsetX * 0.1f);
+				double velZ = (double) (worldObj.rand.nextFloat() * side.offsetZ * 0.1f);
+
+				if (side.offsetX != 0)
+				{
+					z += worldObj.rand.nextFloat() - 0.5f;
+					velZ += (worldObj.rand.nextFloat() - 0.5f) * 0.2f;
+					if (side.offsetX < 0)
+						x -= 0.05f;
+				}
+				else if (side.offsetZ != 0)
+				{
+					x += worldObj.rand.nextFloat() - 0.5f;
+					velX += (worldObj.rand.nextFloat() - 0.5f) * 0.2f;
+					if (side.offsetZ < 0)
+						z -= 0.05f;
+				}
+
+				worldObj.spawnParticle("splash", x, y, z, velX, 0, velZ);
+			}
+
+			if (--ticksUntilNextBubble <= 0)
+			{
+				this.worldObj.spawnParticle("bubble", xCoord + 0.5f + (worldObj.rand.nextFloat() - 0.5f) / 2f, yCoord + 1, zCoord + 0.5f + (worldObj.rand.nextFloat() - 0.5f) / 2f, (worldObj.rand.nextFloat() - 0.25f) * 0.1f,
+											worldObj.rand.nextFloat(), (worldObj.rand.nextFloat()) * 0.25f);
+				ticksUntilNextBubble = 8;
+			}
+		}
 	}
 
 	/*
 	 * Liquid flow
 	 */
-	public boolean handleFlowIntoBlock(BlockDynamicLiquid flowingBlock, int newFlowDecay, ForgeDirection side)
+	@Override
+	public boolean canFluidFlowIntoSide(Fluid fluid, ForgeDirection side)
 	{
-		ModEarliestOfGames.Log.info("onFlowIntoBlock: " + newFlowDecay + " side: " + side);
-
-		if (canItemPassThroughSide(new ItemStack(flowingBlock, 1, 0), side))
-		{
-			liquidFlow.onLiquidFlowFrom(flowingBlock, newFlowDecay, side.getOpposite());
-			return true;
-		}
-
-		return false;
+		return canFluidPassThroughSide(fluid, side) && super.canFluidFlowIntoSide(fluid, side);
 	}
-	
-	public int getFlowDecay(BlockLiquid liquidBlock)
+
+	@Override
+	public boolean canFluidFlowOutOfSide(Fluid fluid, ForgeDirection side)
 	{
-		return liquidFlow.getFlowDecay();
-	}
-	
-	public int getEffectiveFlowDecay(BlockLiquid liquidBlock)
-	{
-		return getFlowDecay(liquidBlock);
+		return canFluidPassThroughSide(fluid, side) && super.canFluidFlowOutOfSide(fluid, side);
 	}
 
 	/*
 	 * Filters
 	 */
+	public IFilter getFilter(ForgeDirection side)
+	{
+		return side == ForgeDirection.UNKNOWN ? null : filters[side.ordinal()];
+	}
+
 	public void setFilterOfSide(ForgeDirection side, IFilter filter)
 	{
 		if (side == ForgeDirection.UNKNOWN)
 			return;
 
-		if (filters[side.ordinal()] != filter)
+		if (getFilter(side) != filter)
 		{
 			filters[side.ordinal()] = filter;
 			onFilterChanged(side);
@@ -117,13 +156,36 @@ public class CrateTile extends TileEntity implements IInventory
 
 	protected void onFilterChanged(ForgeDirection side)
 	{
+		ModEarliestOfGames.Log.info("onFilterChanged");
+		
 		if (side != ForgeDirection.UP)
 			releaseEscapableItems();
+		
+		if (getInputFlow(side) != null && !canFluidFlowIntoSide(getInputFlow(side).getFluid(), side))
+			setInputFlow(side, null);
+		
+		if (getOutputFlow(side) != null && !canFluidFlowOutOfSide(getOutputFlow(side).getFluid(), side))
+			stopOutputFlowOnSide(side);
+		
+		updateOutputFlows(true);
+
+		if (worldObj != null)
+			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, worldObj.getBlock(this.xCoord, this.yCoord, this.zCoord));
 	}
 
 	public boolean canItemPassThroughSide(ItemStack item, ForgeDirection side)
 	{
-		return side != ForgeDirection.UNKNOWN && filters[side.ordinal()] != null && filters[side.ordinal()].passesFilter(item);
+		return getFilter(side) != null && getFilter(side).passesFilter(item);
+	}
+
+	public boolean canFluidPassThroughSide(Fluid fluid, ForgeDirection side)
+	{
+		return getFilter(side) != null && getFilter(side).passesFilter(fluid);
+	}
+
+	public boolean canEntityPassThroughSide(Entity entity, ForgeDirection side)
+	{
+		return getFilter(side) != null && getFilter(side).passesFilter(entity);
 	}
 
 	/*
@@ -188,12 +250,12 @@ public class CrateTile extends TileEntity implements IInventory
 		{
 			if (side == ForgeDirection.UP)
 				continue;
-			
-			boolean canMoveTowardsSide = side == ForgeDirection.DOWN || liquidFlow.isFlowingTowardsSide(side);
+
+			boolean canMoveTowardsSide = side == ForgeDirection.DOWN;
 			if (!canMoveTowardsSide)
 				continue;
-			
-			if (WorldHelper.getBlockOnSide(this, side).isBlockSolid(worldObj, xCoord+side.offsetX, yCoord+side.offsetY, zCoord+side.offsetZ, side.ordinal()))
+
+			if (WorldHelper.getBlockOnSide(this, side).isBlockSolid(worldObj, xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ, side.ordinal()))
 				continue;
 
 			if (canItemPassThroughSide(itemStack, side))
@@ -408,5 +470,17 @@ public class CrateTile extends TileEntity implements IInventory
 				setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
 			}
 		}
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
+	{
+		super.onDataPacket(net, pkt);
+	}
+
+	@Override
+	public Packet getDescriptionPacket()
+	{
+		return super.getDescriptionPacket();
 	}
 }

@@ -1,7 +1,9 @@
 package squeek.earliestofgames;
 
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import squeek.earliestofgames.content.Crate;
 import squeek.earliestofgames.content.CrateRenderer;
 import squeek.earliestofgames.content.CrateTile;
@@ -38,5 +40,10 @@ public class ModContent
 		CrateRenderer crateRenderer = new CrateRenderer();
 		ClientRegistry.bindTileEntitySpecialRenderer(CrateTile.class, crateRenderer);
 		MinecraftForgeClient.registerItemRenderer(ItemBlock.getItemFromBlock(blockCrate), crateRenderer);
+	}
+	
+	public static void registerRecipes()
+	{
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(blockCrate, 1, 0), "___", "_ _", "___", '_', "slabWood"));
 	}
 }

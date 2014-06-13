@@ -22,6 +22,7 @@ public class ModEarliestOfGames
 	{
 		ModContent.registerBlocks();
 		ModContent.registerTileEntities();
+		ModContent.registerRecipes();
 		ModContent.registerHandlers();
 		
 		if (event.getSide() == Side.CLIENT)

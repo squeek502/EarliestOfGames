@@ -5,6 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.util.ForgeDirection;
+import squeek.earliestofgames.filters.EmptyFilter;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.filters.SizeFilter;
 
@@ -158,7 +159,10 @@ public class CrateModel extends ModelBase
 				
 				if (filter != null)
 				{
-					if (filter instanceof SizeFilter)
+					if (filter instanceof EmptyFilter)
+					{
+					}
+					else if (filter instanceof SizeFilter)
 					{
 						ModelRenderer sizeFilter = ((SizeFilter) filter).maxItemSize > 1f ? sizeFilters[2] : (((SizeFilter) filter).maxItemSize <= 0.5f ? sizeFilters[0] : sizeFilters[1]);
 						sizeFilter.setRotationPoint(sidePart.rotationPointX, sidePart.rotationPointY, sidePart.rotationPointZ);
@@ -171,8 +175,7 @@ public class CrateModel extends ModelBase
 				}
 				else
 				{
-					if (side != ForgeDirection.NORTH)
-						sidePart.render(scale);
+					sidePart.render(scale);
 				}
 			}
 			i++;
