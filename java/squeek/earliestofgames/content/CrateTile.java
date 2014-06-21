@@ -1,12 +1,7 @@
 package squeek.earliestofgames.content;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
-import net.minecraft.block.BlockStaticLiquid;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -18,16 +13,13 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.base.TileEntityFluidJunction;
-import squeek.earliestofgames.filters.EmptyFilter;
 import squeek.earliestofgames.filters.IFilter;
 import squeek.earliestofgames.filters.SizeFilter;
 import squeek.earliestofgames.helpers.WorldHelper;
@@ -218,11 +210,13 @@ public class CrateTile extends TileEntityFluidJunction implements IInventory
 		return captureCooldown <= 0;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<EntityItem> getItemEntitiesInside()
 	{
 		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getInnerBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<EntityItem> getItemEntitiesInsideOuterBounds()
 	{
 		return worldObj.selectEntitiesWithinAABB(EntityItem.class, ((Crate) getBlockType()).getOuterBoundingBox(worldObj, xCoord, yCoord, zCoord), IEntitySelector.selectAnything);

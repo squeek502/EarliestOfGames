@@ -1,7 +1,6 @@
 package squeek.earliestofgames.helpers;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -40,11 +39,11 @@ public class FluidHelper
 
 		return flowDecay;
 	}
-	
+
 	public static Fluid getFluidAt(World world, int x, int y, int z, ForgeDirection outputSide)
 	{
 		Fluid fluid = null;
-		
+
 		TileEntity tile = world.getTileEntity(x, y, z);
 
 		if (tile != null && tile instanceof TileEntityFluidJunction)
@@ -59,7 +58,7 @@ public class FluidHelper
 			if (block != null)
 				fluid = getFluidTypeOfBlock(block);
 		}
-		
+
 		return fluid;
 	}
 
@@ -129,5 +128,29 @@ public class FluidHelper
 			return Blocks.flowing_lava;
 		else
 			return fluid.getBlock();
+	}
+
+	public static int getNextFlowDecay(Fluid fluid, int curFlowDecay, ForgeDirection flowDirection)
+	{
+		if (curFlowDecay < 0)
+			return curFlowDecay;
+
+		int quantaPerBlock = getQuantaPerBlock(fluid);
+		if (flowDirection == ForgeDirection.DOWN || flowDirection == ForgeDirection.UP)
+		{
+			if (curFlowDecay >= quantaPerBlock)
+				return curFlowDecay;
+			else
+				return curFlowDecay + quantaPerBlock;
+		}
+		else
+		{
+			if (curFlowDecay >= quantaPerBlock)
+				return 1;
+			else if (curFlowDecay + 1 >= quantaPerBlock)
+				return -1;
+			else
+				return curFlowDecay + 1;
+		}
 	}
 }

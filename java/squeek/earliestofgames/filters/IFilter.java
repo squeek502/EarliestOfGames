@@ -1,12 +1,11 @@
 package squeek.earliestofgames.filters;
 
-import squeek.earliestofgames.helpers.FluidHelper;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
+import squeek.earliestofgames.helpers.FluidHelper;
 
 public abstract class IFilter
 {

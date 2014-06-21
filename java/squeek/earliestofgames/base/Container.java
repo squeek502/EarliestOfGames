@@ -1,6 +1,5 @@
 package squeek.earliestofgames.base;
 
-import java.lang.reflect.InvocationTargetException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;

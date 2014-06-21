@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
-import net.minecraft.block.material.Material;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
@@ -15,11 +14,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import squeek.earliestofgames.ModEarliestOfGames;
 import squeek.earliestofgames.asm.Hooks;
 import squeek.earliestofgames.helpers.FluidHelper;
-import squeek.earliestofgames.helpers.WorldHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -134,9 +131,9 @@ public abstract class TileEntityFluidJunction extends TileEntity implements IFlu
 			if (flow != null && flow.getFluid() == fluid)
 			{
 				if (flowDecay == -1)
-					flowDecay = 0;
-
-				flowDecay += getInputFlow(side).getFlowDecay();
+					flowDecay = getInputFlow(side).getFlowDecay();
+				else
+					flowDecay = Math.min(flowDecay, getInputFlow(side).getFlowDecay());
 			}
 		}
 		return flowDecay;
@@ -326,7 +323,7 @@ public abstract class TileEntityFluidJunction extends TileEntity implements IFlu
 	{
 		if (getOutputFlow(side) != null)
 		{
-			int x = xCoord + side.offsetX, y = yCoord + side.offsetY, z = zCoord + side.offsetZ;
+			//int x = xCoord + side.offsetX, y = yCoord + side.offsetY, z = zCoord + side.offsetZ;
 			outputFlows[side.ordinal()] = null;
 			//worldObj.setBlockToAir(x, y, z);
 		}
@@ -340,7 +337,7 @@ public abstract class TileEntityFluidJunction extends TileEntity implements IFlu
 
 		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 		{
-			int x = xCoord + side.offsetX, y = yCoord + side.offsetY, z = zCoord + side.offsetZ;
+			//int x = xCoord + side.offsetX, y = yCoord + side.offsetY, z = zCoord + side.offsetZ;
 			FluidFlow oldOutputFlow = getOutputFlow(side);
 
 			if (oldOutputFlow != null && oldOutputFlow.getFluid() == fluid)
@@ -362,7 +359,10 @@ public abstract class TileEntityFluidJunction extends TileEntity implements IFlu
 	{
 		int x = xCoord + side.offsetX, y = yCoord + side.offsetY, z = zCoord + side.offsetZ;
 		
-		int newFlowDecay = flow.getFlowDecay()-(flow.getFluid().getDensity() > 0 ? -1 : 1);
+		int newFlowDecay = FluidHelper.getNextFlowDecay(flow.getFluid(), flow.getFlowDecay(), side);
+		
+		if (newFlowDecay < 0)
+			return;
 
 		Hooks.onFlowIntoBlockFrom((BlockDynamicLiquid) FluidHelper.getFlowingFluidBlock(flow.getFluid()), worldObj, x, y, z, newFlowDecay, side.ordinal());
 		onFluidFlowOutOfSide(flow.getFluid(), side, flow.getFlowDecay());

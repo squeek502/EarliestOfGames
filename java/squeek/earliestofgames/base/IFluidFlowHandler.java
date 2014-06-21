@@ -1,6 +1,5 @@
 package squeek.earliestofgames.base;
 
-import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 

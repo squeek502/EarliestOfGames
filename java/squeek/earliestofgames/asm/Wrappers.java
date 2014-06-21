@@ -6,8 +6,6 @@ import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 
 // TODO: Deal with obfuscation of the methods
 public class Wrappers

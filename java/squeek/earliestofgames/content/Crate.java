@@ -2,7 +2,6 @@ package squeek.earliestofgames.content;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
@@ -199,7 +198,8 @@ public class Crate extends BlockContainer implements IHollowBlock
 
 		return AxisAlignedBB.getAABBPool().getAABB(offsetX + minX, offsetY + minY, offsetZ + minZ, offsetX + maxX, offsetY + maxY, offsetZ + maxZ);
 	}
-
+	
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB collidingAABB, List collidingBoundingBoxes, Entity collidingEntity)
 	{
@@ -215,7 +215,7 @@ public class Crate extends BlockContainer implements IHollowBlock
 			boolean isItem = collidingEntity instanceof EntityItem;
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				boolean canPassThrough = ((CrateTile) tile).canEntityPassThroughSide(collidingEntity, side);
+				boolean canPassThrough = crate.canEntityPassThroughSide(collidingEntity, side);
 				List<AxisAlignedBB> AABBs = new ArrayList<AxisAlignedBB>(4);
 
 				if (isItem && canPassThrough)

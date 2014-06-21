@@ -1,14 +1,9 @@
 package squeek.earliestofgames.base;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import squeek.earliestofgames.ModEarliestOfGames;
 
 public abstract class BlockFluidJunction extends Block
 {

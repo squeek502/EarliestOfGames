@@ -41,3 +41,4 @@ LICENSE.txt
 
 # Misc
 *.rej
+/java/net

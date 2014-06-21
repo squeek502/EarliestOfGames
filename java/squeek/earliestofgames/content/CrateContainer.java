@@ -1,9 +1,6 @@
 package squeek.earliestofgames.content;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import squeek.earliestofgames.base.Container;
 
 public class CrateContainer extends Container
